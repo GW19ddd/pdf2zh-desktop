@@ -1,7 +1,7 @@
 {
     "name":  "pdf2zh-desktop-connector",
     "type":  "module",
-    "version":  "1.0.30",
+    "version":  "1.0.31",
     "description":  "Right-click translate PDF with pdf2zh-desktop and add the translated PDF back to the Zotero item (linked file beside the original).",
     "config":  {
                    "prefsPrefix":  "extensions.zotero.pdf2zh",

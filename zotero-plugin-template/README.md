@@ -26,5 +26,6 @@ npm run build
 
 ## 版本
 
+- **v1.0.31**：修复设置面板「浏览应用路径」无效（Zotero 7/9 移除 `Components`，改用 `Zotero.FilePicker`），支持手动输入路径
 - **v1.0.30**：修复链接附件判断（Zotero 9 `LINK_MODE_LINKED_FILE = 2`，此前误判为 3），链接附件译文改用 `linkFromFile` 放回原目录；右键菜单与设置面板回归
 - v1.0.29：右键菜单 / 设置面板重构（better-notes 模板）

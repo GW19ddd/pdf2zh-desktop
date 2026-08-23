@@ -47,3 +47,6 @@ pdf2zh-desktop-slim/
 
 # Local reference files (not part of the product)
 reference/
+
+# Local release build output
+.release/

@@ -176,54 +176,55 @@ function loadSubprocess(): any {
 /** 找不到程序时让用户手动指定一次，存进 pref 永久生效。 */
 function promptPickExecutable(): Promise<string | null> {
   return new Promise((resolve) => {
-    let picked: string | null = null;
-    try {
-      const win = Zotero.getMainWindow();
-      const yes = Services.prompt.confirm(win as any,
-        "pdf2zh-desktop Connector",
-        "没有自动找到 pdf2zh-desktop 应用。\n\n" +
-          "Windows: 请确认已把 pdf2zh-desktop-win 文件夹解压出来(里面有 pdf2zh.exe)。\n" +
-          "Mac: 确认 pdf2zh.app 在“应用程序”里。\n\n" +
-          "点“确定”手动选择 " +
-          (Zotero.isWin ? "pdf2zh.exe" : "pdf2zh.app") +
-          " 的位置(只需选一次)；\n" +
-          "点“取消”去下载：github.com/GW19ddd/pdf2zh-desktop/releases"
-      );
-      if (yes) {
-        const fp = (Components.classes as any)["@mozilla.org/filepicker;1"].createInstance(
-          Components.interfaces.nsIFilePicker
+    void (async () => {
+      let picked: string | null = null;
+      try {
+        const win = Zotero.getMainWindow();
+        const yes = Services.prompt.confirm(win as any,
+          "pdf2zh-desktop Connector",
+          "没有自动找到 pdf2zh-desktop 应用。\n\n" +
+            "Windows: 请确认已把 pdf2zh-desktop-win 文件夹解压出来(里面有 pdf2zh.exe)。\n" +
+            "Mac: 确认 pdf2zh.app 在“应用程序”里。\n\n" +
+            "点“确定”手动选择 " +
+            (Zotero.isWin ? "pdf2zh.exe" : "pdf2zh.app") +
+            " 的位置(只需选一次)；\n" +
+            "点“取消”去下载：github.com/GW19ddd/pdf2zh-desktop/releases"
         );
-        fp.init(win, "选择 pdf2zh 程序", fp.modeOpen);
-        if (Zotero.isWin) {
-          fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
-          fp.appendFilters(fp.filterApps);
-        }
-        const rv = fp.show ? fp.show() : fp.open;
-        if (rv === fp.returnOK && fp.file) {
-          picked = fp.file.path;
-          try {
-            prefSet("exePath", picked);
-          } catch (e) {
-            /* ignore */
+        if (yes) {
+          // Zotero 7/9 已移除扩展里的 Components，改用 Zotero.FilePicker
+          const FP: any = (Zotero as any).FilePicker;
+          const fp = new FP();
+          fp.init(win, "选择 pdf2zh 程序", fp.modeOpen);
+          if (Zotero.isWin) {
+            fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
+            fp.appendFilters(fp.filterApps);
+          }
+          const rv = await fp.show();
+          if (rv === fp.returnOK && fp.file) {
+            picked = fp.file.path;
+            try {
+              prefSet("exePath", picked);
+            } catch (e) {
+              /* ignore */
+            }
           }
         }
+      } catch (e) {
+        /* 老版本 Zotero 时 filepicker 降级 */
       }
-    } catch (e) {
-      /* 老版本 Zotero 无 filepicker 时降级 */
-    }
-    if (!picked) {
-      alertUser(
-        "pdf2zh-desktop Connector",
-        "未找到 pdf2zh-desktop 应用。\n" +
-          "Windows: 把下载的 zip 解压, 确认有 pdf2zh-desktop-win\\pdf2zh.exe；建议解压到“下载”或“桌面”。\n" +
-          "Mac: 把 pdf2zh.app 放进“应用程序”。\n\n" +
-          "下载：https://github.com/GW19ddd/pdf2zh-desktop/releases"
-      );
-    }
-    resolve(picked);
+      if (!picked) {
+        alertUser(
+          "pdf2zh-desktop Connector",
+          "未找到 pdf2zh-desktop 应用。\n" +
+            "Windows: 把下载的 zip 解压, 确认有 pdf2zh-desktop-win\\pdf2zh.exe；建议解压到“下载”或“桌面”。\n" +
+            "Mac: 把 pdf2zh.app 放进“应用程序”。\n\n" +
+            "下载：https://github.com/GW19ddd/pdf2zh-desktop/releases"
+        );
+      }
+      resolve(picked);
+    })();
   });
 }
-
 export async function launchPdf2zh(
   filePath: string,
   format: string | null,

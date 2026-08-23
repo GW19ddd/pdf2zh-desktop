@@ -226,7 +226,7 @@
 - 默认翻译格式：中外并排 / 上下双语 / 纯中文 / 全部 3 种
 - 静默翻译开关、翻译完成后在 Zotero 中定位该文献
 - pdf2zh 程序路径：自动探测 / 手动浏览（找不到应用时会弹窗引导手动选择一次，之后记住）
-- 插件版本 v1.0.30，兼容 Zotero 7 / 8 / 9，支持自动更新（updates.json）
+- 插件版本 v1.0.31，兼容 Zotero 7 / 8 / 9，支持自动更新（updates.json）
 
 ---
 
@@ -285,7 +285,7 @@
 | 怎么用 DeepSeek？ | 选 DeepSeek → 填 API Key → 选模型 |
 | 怎么用自己的 API？ | 选「OpenAI 兼容格式」→ 快捷预设一键配置 |
 | 怎么保证术语准确？ | 展开「术语库」→ 选学科模板或自定义 |
-| Zotero 翻译后没显示附件？ | 设置页点「一键安装插件」或从 Releases 下载最新 pdf2zh Connector xpi（v1.0.30） |
+| Zotero 翻译后没显示附件？ | 设置页点「一键安装插件」或从 Releases 下载最新 pdf2zh Connector xpi（v1.0.31） |
 
 ---
 
@@ -295,7 +295,8 @@
 
 - 🔧 **修复右键翻译后「Zotero 联动失败」**：桌面端回写函数 `zotero_writeback` 未导入导致 `NameError`，且右键传入的 `--zotero-key` 未保存到窗口实例；现在链接附件（zotero 移动 / zotmoov 等场景）的译文会正确放回原 PDF 同目录并关联回条目
 - 🐛 **修复 Connector 插件链接附件判断**：Zotero 9 的 `LINK_MODE_LINKED_FILE` 常量是 `2`（此前误判为 `3`），链接附件译文改用 `linkFromFile` 放回原目录，不再被复制进 storage
-- ✨ **Connector 插件升级到 v1.0.30**：右键菜单、插件设置面板、自动更新（updates.json 指向本仓库）全部可用；`assets/pdf2zh-connector.xpi` 与 Release 产物同步
+- ✨ **Connector 插件升级到 v1.0.31**：右键菜单、插件设置面板、自动更新（updates.json 指向本仓库）全部可用；`assets/pdf2zh-connector.xpi` 与 Release 产物同步
+- 🔧 **修复插件设置面板「浏览应用路径」无效**：Zotero 7/9 移除了扩展里的 `Components`，改用 `Zotero.FilePicker`，现在可以自己选择 `pdf2zh.exe` 路径（也支持手动输入）
 
 ### v2.3.16（2026-08-21）
 

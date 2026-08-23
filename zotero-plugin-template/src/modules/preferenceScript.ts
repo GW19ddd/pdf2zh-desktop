@@ -65,6 +65,12 @@ export async function registerPrefsScripts(_window: Window): Promise<void> {
   fmt.value = f;
   fmt.addEventListener("change", () => setP("format", fmt.value));
 
+  // 手动输入路径：保存并刷新提示
+  exe.addEventListener("input", () => {
+    setP("exePath", exe.value);
+    refresh(exe.value);
+  });
+
   function onDetect(): void {
     const found = findPdf2zhExecutable();
     if (found) {
@@ -75,7 +81,7 @@ export async function registerPrefsScripts(_window: Window): Promise<void> {
   }
 
   function onBrowse(): void {
-    pickExecutable((p) => {
+    void pickExecutable((p) => {
       if (p) {
         setP("exePath", p);
         exe.value = p;
@@ -99,18 +105,18 @@ export async function registerPrefsScripts(_window: Window): Promise<void> {
   refresh(exe.value || getP("exePath", ""));
 }
 
-function pickExecutable(cb: (path: string) => void): void {
+async function pickExecutable(cb: (path: string) => void): Promise<void> {
   try {
     const win = Zotero.getMainWindow();
-    const fp = (Components.classes as any)["@mozilla.org/filepicker;1"].createInstance(
-      Components.interfaces.nsIFilePicker
-    );
+    // Zotero 7/9 已移除扩展里的 Components，改用 Zotero.FilePicker
+    const FP: any = (Zotero as any).FilePicker;
+    const fp = new FP();
     fp.init(win, "选择 pdf2zh 程序", fp.modeOpen);
     if (Zotero.isWin) {
       fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
       fp.appendFilters(fp.filterApps);
     }
-    const rv = fp.show ? fp.show() : fp.open;
+    const rv = await fp.show();
     if (rv === fp.returnOK && fp.file) cb(fp.file.path);
   } catch (e) {
     debugLog("pickExecutable error: " + e);

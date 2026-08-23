@@ -31,6 +31,16 @@
                             "strict_max_version": "9.*"
                         }
                     }
+                },
+                {
+                    "version": "1.0.31",
+                    "update_link": "https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.17/pdf2zh-connector-v1.0.31.xpi",
+                    "applications": {
+                        "zotero": {
+                            "strict_min_version": "7.0",
+                            "strict_max_version": "9.*"
+                        }
+                    }
                 }
             ]
         }
