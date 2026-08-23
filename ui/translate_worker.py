@@ -215,10 +215,13 @@ def _local_opener():
     return urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 
-def zotero_auto_link(item_key: str, file_path: str, title: str):
+def zotero_auto_link(item_key: str, file_path: str, title: str,
+                     parent_file_path: str = None):
     """
     通过 pdf2zh-connector 插件将译文自动添加为 Zotero 附件。
     端点: POST http://127.0.0.1:23119/pdf2zh/attach
+    parent_file_path: v1.0.20 原 PDF 路径。链接附件(zotmoov 等移动过、不在 storage 里)场景下,
+                      插件据此判断原附件 linkMode, 译文会放到原 PDF 同目录并做成链接附件。
     返回 (success: bool, message: str)
     """
     import urllib.request
@@ -227,10 +230,14 @@ def zotero_auto_link(item_key: str, file_path: str, title: str):
     import json
     # macOS 文件系统用 NFD，Python 默认 NFC，混用会导致 Zotero 找不到文件
     normalized_path = unicodedata.normalize('NFC', os.path.abspath(file_path))
+    parent_path = None
+    if parent_file_path:
+        parent_path = unicodedata.normalize('NFC', os.path.abspath(parent_file_path))
     payload = json.dumps({
         "itemKey": item_key,
         "filePath": normalized_path,
         "title": title,
+        "parentFilePath": parent_path,
     }, ensure_ascii=False).encode("utf-8")
     try:
         req = urllib.request.Request(
@@ -271,15 +278,49 @@ def zotero_plugin_installed():
 
 
 def _find_zotero_data_dir():
-    """定位 Zotero 数据目录（含 zotero.sqlite）"""
+    """定位 Zotero 数据目录（含 zotero.sqlite）。
+
+    v2.3.x 增强：用户在 Zotero 偏好里改过「数据存储位置」时, 默认的 ~/Zotero
+    找不到 zotero.sqlite, 必须去读 Zotero profile 的 prefs.js 里的
+    extensions.zotero.dataDir, 否则 SQLite 反查(链接附件回写)会静默失败。
+    """
     import platform
+    import glob as _glob
+    system = platform.system()
+    # 1) 默认位置
     candidates = [os.path.expanduser("~/Zotero")]
-    if platform.system() == "Darwin":
+    if system == "Darwin":
         candidates.append(os.path.expanduser(
             "~/Library/Application Support/Zotero"))
     for d in candidates:
         if os.path.isfile(os.path.join(d, "zotero.sqlite")):
             return d
+    # 2) prefs.js 里自定义的 dataDir
+    profile_roots = []
+    if system == "Windows":
+        profile_roots.append(os.path.expanduser(
+            r"~/AppData/Roaming/Zotero/Zotero/Profiles"))
+    elif system == "Darwin":
+        profile_roots.append(os.path.expanduser(
+            "~/Library/Application Support/Zotero/Profiles"))
+    else:
+        profile_roots.append(os.path.expanduser("~/.zotero/zotero"))
+    for root in profile_roots:
+        if not os.path.isdir(root):
+            continue
+        for prefs in _glob.glob(os.path.join(root, "*", "prefs.js")):
+            try:
+                with open(prefs, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        m = re.search(
+                            r'user_pref\("extensions\.zotero\.dataDir",\s*"([^"]*)"\)',
+                            line)
+                        if m:
+                            d = m.group(1).replace("\\\\", "\\")
+                            if os.path.isfile(os.path.join(d, "zotero.sqlite")):
+                                return d
+            except Exception:
+                continue
     return None
 
 
@@ -401,6 +442,8 @@ def _resolve_zotero_path(storage_dir, key, db_path):
 
     Zotero path 格式: 'storage:filename.pdf'
     实际路径: {storage_dir}/{key}/{filename.pdf}
+    v1.0.20: 支持链接附件 —— ia.path 可能是 'attachments:xxx.pdf'(相对 baseAttachmentDir)
+    或绝对路径(zotmoov 等插件把 PDF 移到自定义目录后)。
     """
     if not db_path:
         return None
@@ -410,7 +453,130 @@ def _resolve_zotero_path(storage_dir, key, db_path):
     full = os.path.join(storage_dir, key, filename)
     if os.path.isfile(full):
         return full
+    # v1.0.20: 链接附件处理
+    if filename.startswith("attachments:"):
+        filename = filename[len("attachments:"):]
+        full = os.path.join(storage_dir, filename)
+        if os.path.isfile(full):
+            return full
+    # 绝对路径(Windows 存反斜杠, 跨平台可能出现正斜杠)
+    for cand in (filename, filename.replace("\\", "/"), filename.replace("/", "\\")):
+        if os.path.isfile(cand):
+            return cand
     return None
+
+
+def _find_zotero_prefs_path():
+    """返回 Zotero profile 的 prefs.js 路径(找不到返回 None)。"""
+    import platform
+    import glob as _glob
+    system = platform.system()
+    profile_roots = []
+    if system == "Windows":
+        profile_roots.append(os.path.expanduser(
+            r"~/AppData/Roaming/Zotero/Zotero/Profiles"))
+    elif system == "Darwin":
+        profile_roots.append(os.path.expanduser(
+            "~/Library/Application Support/Zotero/Profiles"))
+    else:
+        profile_roots.append(os.path.expanduser("~/.zotero/zotero"))
+    for root in profile_roots:
+        if not os.path.isdir(root):
+            continue
+        for prefs in _glob.glob(os.path.join(root, "*", "prefs.js")):
+            return prefs
+    return None
+
+
+def _zotero_pref_value(prefs_path, name):
+    """从 prefs.js 读取单个 user_pref 字符串值, 反斜杠还原。"""
+    if not prefs_path or not os.path.isfile(prefs_path):
+        return None
+    try:
+        with open(prefs_path, "r", encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                m = re.search(r'user_pref\("' + re.escape(name) + r'",\s*"([^"]*)"\)', line)
+                if m:
+                    return m.group(1).replace("\\\\", "\\")
+    except Exception:
+        pass
+    return None
+
+
+def resolve_zotero_key_for_path(abs_path):
+    """v1.0.20: 通过文件绝对路径反查 Zotero PDF 附件 key。
+
+    覆盖 zotmoov 等插件把 PDF 移到自定义目录后的「链接附件」:
+    这类附件的 itemAttachments.path 在文件不在 storage 内时直接存绝对路径,
+    detect_zotero_source / get_zotero_item_key 按 storage 正则拿不到条目,
+    这里用 SQLite 只读反查。返回 8 位 key 或 None。
+    """
+    import sqlite3
+    data_dir = _find_zotero_data_dir()
+    if not data_dir:
+        return None
+    db_path = os.path.join(data_dir, "zotero.sqlite")
+    try:
+        conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        cur = conn.cursor()
+        keys = set()
+        # 1) 绝对路径直接匹配(链接附件在 ia.path 里存绝对路径; Windows 大小写不敏感)
+        candidates = [abs_path, abs_path.replace("\\", "/"), abs_path.replace("/", "\\")]
+        for c in candidates:
+            cur.execute(
+                "SELECT i.key FROM items i "
+                "JOIN itemAttachments ia ON i.itemID = ia.itemID "
+                "WHERE ia.contentType = 'application/pdf' AND ia.path COLLATE NOCASE = ?",
+                (c,),
+            )
+            keys.update(r[0] for r in cur.fetchall())
+        # 2) attanger/zotmoov 链接附件: 文件在 baseAttachmentPath 内时,
+        #    ia.path 存 "attachments:相对路径" (如 attachments:Agent/code/xxx.pdf),
+        #    用 baseAttachmentPath 计算相对路径做精确匹配, 避免同名副本的 basename 歧义
+        if not keys:
+            prefs = _find_zotero_prefs_path()
+            base = _zotero_pref_value(prefs, "extensions.zotero.baseAttachmentPath")
+            if not base:
+                base = _zotero_pref_value(
+                    prefs, "extensions.zotero.translators.better-bibtex.baseAttachmentPath")
+            if base:
+                try:
+                    rel = os.path.relpath(abs_path, base).replace("\\", "/")
+                    if not rel.startswith(".."):
+                        cur.execute(
+                            "SELECT i.key FROM items i "
+                            "JOIN itemAttachments ia ON i.itemID = ia.itemID "
+                            "WHERE ia.contentType = 'application/pdf' AND ia.path COLLATE NOCASE = ?",
+                            ("attachments:" + rel,),
+                        )
+                        keys.update(r[0] for r in cur.fetchall())
+                except Exception:
+                    pass
+        # 3) 文件在 baseAttachmentDir 内 → attachments:xxx.pdf 相对匹配
+        if not keys:
+            b = os.path.basename(abs_path)
+            cur.execute(
+                "SELECT i.key FROM items i "
+                "JOIN itemAttachments ia ON i.itemID = ia.itemID "
+                "WHERE ia.contentType = 'application/pdf' AND ia.path COLLATE NOCASE = ?",
+                ("attachments:" + b,),
+            )
+            keys.update(r[0] for r in cur.fetchall())
+        # 4) v2.3.x: basename 兜底 —— 拖拽进应用的文件往往是临时副本/大小写或盘符
+        #    写法不同, 精确匹配会失败; 用文件名末尾匹配 ia.path, 覆盖链接附件场景
+        if not keys and b:
+            cur.execute(
+                "SELECT i.key FROM items i "
+                "JOIN itemAttachments ia ON i.itemID = ia.itemID "
+                "WHERE ia.contentType = 'application/pdf' "
+                "AND ia.path COLLATE NOCASE LIKE ?",
+                ("%" + b,),
+            )
+            keys.update(r[0] for r in cur.fetchall())
+        conn.close()
+        return next(iter(keys)) if keys else None
+    except Exception:
+        return None
 
 
 def resolve_zotero_by_title(text):

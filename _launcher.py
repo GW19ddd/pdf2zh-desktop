@@ -112,9 +112,12 @@ def ensure_window_visible(window, app):
 
 def _parse_cli_args(argv):
     """v2.3.4: 解析 Zotero 右键唤起的命令行参数
-    支持: pdf2zh.exe [--format=side_by_side|dual|mono|all] [--auto] <file.pdf>
+    支持: pdf2zh.exe [--format=side_by_side|dual|mono|all] [--auto] [--silent]
+                    [--zotero-key=XXXXXXXX] [--zotero-link-mode=0|1|2|3] <file.pdf>
+    --zotero-key / --zotero-link-mode: v1.0.20 起由插件传入, 用于对 zotmoov 等移动过的链接附件做 Zotero 回写
     """
-    result = {"file": None, "format": None, "auto": False, "silent": False}
+    result = {"file": None, "format": None, "auto": False, "silent": False,
+              "zotero_key": None, "zotero_link_mode": None}
     try:
         for arg in argv[1:]:
             if arg.startswith("--format="):
@@ -125,6 +128,11 @@ def _parse_cli_args(argv):
                 result["auto"] = True
             elif arg == "--silent":
                 result["silent"] = True
+            elif arg.startswith("--zotero-key="):
+                result["zotero_key"] = arg.split("=", 1)[1].strip()
+            elif arg.startswith("--zotero-link-mode="):
+                mode = arg.split("=", 1)[1].strip()
+                result["zotero_link_mode"] = int(mode) if mode.isdigit() else None
             elif arg.lower().endswith(".pdf") and os.path.isfile(arg):
                 result["file"] = arg
     except Exception:
@@ -307,6 +315,12 @@ def main():
                 fmt = payload.get("format")
                 if fmt:
                     window._cli_output_format = fmt
+                # v1.0.20: Zotero 附件元数据(链接附件回写用)
+                zkey = payload.get("zotero_key")
+                if zkey:
+                    window._cli_zotero_key = zkey
+                if payload.get("zotero_link_mode") is not None:
+                    window._cli_zotero_link_mode = payload["zotero_link_mode"]
                 # v2.3.4: 后台静默模式 —— 最小化窗口不抢焦点, 完成后自动关闭
                 silent = bool(payload.get("silent"))
                 if silent:

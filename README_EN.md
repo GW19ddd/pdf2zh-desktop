@@ -65,15 +65,29 @@ Tired of wrestling with Python environments just to translate a paper? Done with
 
 ## 🚀 Three Steps to Get Started
 
-1. 📥 **[Download the latest Release](https://github.com/AaronGIG/pdf2zh-desktop/releases/latest)** (zip file, ready to use)
+1. 📥 **[Download the latest Release](https://github.com/GW19ddd/pdf2zh-desktop/releases/latest)** (zip file, ready to use)
 2. 🖱️ **Double-click `pdf2zh.bat`** to launch
 3. 📄 **Drop in a PDF** → pick a translation service → hit "Start Translation" → done! 🎉
 
 > 💡 **Tip**: Google / Bing translation is free and requires zero configuration — just open and go!
 >
-> ⚠️ Download the zip from the [Releases page](https://github.com/AaronGIG/pdf2zh-desktop/releases/latest). Do **NOT** click "Source code" — it won't work out of the box.
+> ⚠️ Download the zip from the [Releases page](https://github.com/GW19ddd/pdf2zh-desktop/releases/latest). Do **NOT** click "Source code" — it won't work out of the box.
 
 ---
+
+## 🔗 Zotero Integration
+
+Translate PDFs directly from Zotero — the translated PDF is automatically added back to the item:
+
+- **One-click plugin install**: Settings → Zotero → "Install Zotero plugin" (Windows / macOS), then restart Zotero
+- **Right-click translate**: right-click a PDF attachment in the item tree or inside the PDF reader → "📖 用 pdf2zh-desktop 翻译" (Translate with pdf2zh-desktop)
+- **Formats**: side-by-side / dual / mono / all three — selectable right from the context menu
+- **Linked attachments**: if the original PDF lives outside Zotero storage (moved by zotmoov / attanger), the translation is placed next to it and linked back to the item (plugin v1.0.30+)
+- **Plugin settings panel**: Zotero → Settings → pdf2zh 翻译 — default format, silent translation, auto-locate item, app path
+- **Silent mode**: translate in the background without stealing focus; the window closes itself when done
+
+> The plugin only needs to be installed once. Users without Zotero are completely unaffected.
+> Compatible with Zotero 7 / 8 / 9; auto-updates via updates.json.
 
 ## 🌍 20+ Translation Services — Pick Your Favorite
 

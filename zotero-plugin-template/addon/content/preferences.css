@@ -1,0 +1,16 @@
+.pdf2zh-hint {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.5;
+  margin: 2px 0 12px 0;
+}
+
+#pdf2zh-exepath {
+  min-width: 320px;
+  margin-right: 6px;
+}
+
+#pdf2zh-detect,
+#pdf2zh-browse {
+  margin-left: 6px;
+}

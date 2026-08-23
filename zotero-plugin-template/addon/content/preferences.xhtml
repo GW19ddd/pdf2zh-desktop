@@ -1,0 +1,58 @@
+<linkset>
+  <html:link rel="localization" href="__addonRef__-preferences.ftl" />
+</linkset>
+<groupbox
+  id="pdf2zh-pref-group"
+  onload="Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window })"
+>
+  <label><html:h2 data-l10n-id="pref-title"></html:h2></label>
+
+  <hbox align="center">
+    <html:label for="pdf2zh-format" data-l10n-id="pref-format"></html:label>
+    <html:select id="pdf2zh-format" preference="format">
+      <html:option value="side_by_side" data-l10n-id="pref-format-side-by-side"></html:option>
+      <html:option value="dual" data-l10n-id="pref-format-dual"></html:option>
+      <html:option value="mono" data-l10n-id="pref-format-mono"></html:option>
+      <html:option value="all" data-l10n-id="pref-format-all"></html:option>
+    </html:select>
+  </hbox>
+  <html:div class="pdf2zh-hint" data-l10n-id="pref-format-hint"></html:div>
+
+  <checkbox
+    id="zotero-prefpane-__addonRef__-silent"
+    preference="silent"
+    data-l10n-id="pref-silent"
+  />
+  <checkbox
+    id="zotero-prefpane-__addonRef__-autofocus"
+    preference="autoFocus"
+    data-l10n-id="pref-autofocus"
+  />
+  <html:div class="pdf2zh-hint" data-l10n-id="pref-autofocus-hint"></html:div>
+
+  <hbox align="center">
+    <html:label for="pdf2zh-exepath" data-l10n-id="pref-exepath"></html:label>
+    <html:input type="text" id="pdf2zh-exepath" readonly="readonly" preference="exePath" />
+    <button id="pdf2zh-detect" data-l10n-id="pref-detect"></button>
+    <button id="pdf2zh-browse" data-l10n-id="pref-browse"></button>
+  </hbox>
+  <html:div id="pdf2zh-exehint" class="pdf2zh-hint"></html:div>
+
+  <html:div class="pdf2zh-hint" data-l10n-id="pref-link-hint"></html:div>
+</groupbox>
+<script>
+  // 等 DOM ready 后再初始化面板脚本（部分 Zotero 版本 groupbox onload 时序不稳）
+  // 幂等：preferenceScript 内部有 WeakSet 去重，重复调用不会重复绑定事件
+  (function (win) {
+    function go() {
+      try {
+        Zotero.__addonInstance__.hooks.onPrefsEvent('load', { window: win });
+      } catch (e) {}
+    }
+    if (win.document.readyState === 'complete' || win.document.readyState === 'interactive') {
+      (win.setTimeout || setTimeout)(go, 0);
+    } else {
+      win.addEventListener('load', go, { once: true });
+    }
+  })(window);
+</script>

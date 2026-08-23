@@ -628,6 +628,20 @@ def _install_pdf2zh_color_fix():
 _install_pdf2zh_color_fix()
 
 
+def _find_zotero_exe_windows():
+    """定位 Windows 版 Zotero.exe（常见安装路径）"""
+    import glob as _glob
+    cands = []
+    for base in (os.environ.get("ProgramFiles", "C:\\Program Files"),
+                 os.environ.get("ProgramFiles(x86)", "C:\\Program Files (x86)"),
+                 os.path.expanduser(r"~/AppData/Local/Programs/Zotero")):
+        cands.append(os.path.join(base, "Zotero", "zotero.exe"))
+    for c in cands:
+        if os.path.isfile(c):
+            return c
+    hits = _glob.glob(os.path.expanduser(r"~/AppData/Local/Programs/Zotero*/zotero.exe"))
+    return hits[0] if hits else None
+
 def _res(*parts):
     """获取资源文件路径，兼容 PyInstaller 打包和开发环境"""
     if getattr(sys, '_MEIPASS', None):
@@ -650,10 +664,11 @@ from ui.translate_worker import (
     TranslateWorker, LANG_MAP, SERVICE_MAP, PAGE_PRESETS,
     OUTPUT_MODES, parse_page_range, detect_zotero_source,
     get_zotero_item_key, zotero_auto_link, zotero_plugin_installed,
+    resolve_zotero_key_for_path,
     build_service_envs, SummaryWorker, QAWorker, UpdateCheckWorker,
 )
 
-APP_VERSION = "2.3.16"  # v2.3.7: 检查更新用的单一版本号来源, 关于页的 QLabel 文案仍需手动同步
+APP_VERSION = "2.3.17"  # v2.3.7: 检查更新用的单一版本号来源, 关于页的 QLabel 文案仍需手动同步
 
 # ─── 苹果风配色 ─────────────────────────────────────────────
 
@@ -3856,7 +3871,7 @@ class TranslatePage(QWidget):
                         "但 Zotero 插件（pdf2zh Connector）没响应，翻译完不会自动加到 Zotero 库里。\n\n"
                         "可能原因：\n"
                         "  1. Zotero 没打开 → 请打开 Zotero 后重试\n"
-                        "  2. 插件没装 → 下载 pdf2zh-connector-v1.0.7.xpi 手动装到 Zotero\n"
+                        "  2. 插件没装 → 在设置页点「一键安装插件」，或从 github releases 下载最新 pdf2zh-connector xpi 手动安装\n"
                         "  3. 插件启动失败 → 到 Zotero「附加组件」检查有没有错误\n\n"
                         "是否仍要继续翻译？（结果会保存在默认目录，不同步到 Zotero）",
                         QMessageBox.Yes | QMessageBox.No,
@@ -3948,6 +3963,13 @@ class TranslatePage(QWidget):
             self.worker.output_formats = [_cli_fmt]
             # 用完清掉，避免影响下次手动翻译
             self._cli_format = None
+        # v1.0.20: 链接附件(zotmoov 等移动过)回写用 —— 插件右键唤起时通过 --zotero-key / --zotero-link-mode 传入
+        self._zotero_key = getattr(self, "_cli_zotero_key", None)
+        self._zotero_link_mode = getattr(self, "_cli_zotero_link_mode", None)
+        self._zotero_writeback_ok = False
+        # 用完清掉，避免影响下次手动翻译
+        self._cli_zotero_key = None
+        self._cli_zotero_link_mode = None
         self.worker.progress.connect(self._on_prog)
         self.worker.status.connect(self._on_status)
         self.worker.finished.connect(self._on_single_done)
@@ -4109,8 +4131,29 @@ class TranslatePage(QWidget):
         _dbg_write(f"_zotero_writeback file_path={file_path!r} output_files={output_files}")
         zotero_dir = detect_zotero_source(file_path)
         _dbg_write(f"  detect_zotero_source → {zotero_dir!r}")
-        if not zotero_dir:
-            _dbg_write("  ✗ not from Zotero storage, skip writeback")
+        # v1.0.20: 链接附件(zotmoov 等插件把 PDF 移到自定义目录)不在 Zotero storage 里,
+        # detect_zotero_source 拿不到目录; 用附件 key 兜底继续回写(插件端会按原附件 linkMode
+        # 决定译文放原 PDF 同目录还是进 storage)。key 来源优先级:
+        #   1) 右键唤起时插件通过 --zotero-key 传入的附件 key
+        #   2) storage 路径正则提取
+        #   3) SQLite 按绝对路径反查(拖拽/手动打开链接附件场景)
+        item_key = getattr(self, "_zotero_key", None) or get_zotero_item_key(file_path)
+        if not item_key:
+            try:
+                from ui.translate_worker import _find_zotero_data_dir as _find_zdd
+                _data_dir = _find_zdd()
+                _dbg_write(f"  db data dir probe → {_data_dir!r}")
+                item_key = resolve_zotero_key_for_path(file_path)
+                if item_key:
+                    _dbg_write(f"  resolved item_key via db path lookup → {item_key}")
+                else:
+                    _dbg_write(f"  ✗ db key lookup: no match for {file_path!r}"
+                              f" (data_dir={_data_dir!r})")
+            except Exception as e:
+                _dbg_write(f"  ✗ db key lookup failed: {e}")
+        _dbg_write(f"  item_key={item_key!r}")
+        if not zotero_dir and not item_key:
+            _dbg_write("  ✗ not from Zotero (no storage dir & no item key), skip writeback")
             return
         cfg = UserConfigManager.load()
         # v2.3.4: 右键唤起指定了格式时, 回写格式跟随右键选择(而非 config 勾选)
@@ -4122,7 +4165,6 @@ class TranslatePage(QWidget):
         else:
             modes = cfg.get("zotero_output_modes", ["side_by_side"])
         keep_copy = cfg.get("zotero_keep_copy", True)
-        item_key = get_zotero_item_key(file_path)
         _dbg_write(f"  modes={modes} item_key={item_key!r}")
         for mode in modes:
             src = output_files.get(mode)
@@ -4140,14 +4182,17 @@ class TranslatePage(QWidget):
 
             linked = False
             if item_key:
-                _dbg_write(f"    POST /pdf2zh/attach itemKey={item_key} title={title!r} file={src!r}")
+                _dbg_write(f"    POST /pdf2zh/attach itemKey={item_key} title={title!r} file={src!r} parent={file_path!r}")
                 try:
-                    ok, msg = zotero_auto_link(item_key, src, title)
+                    # v1.0.20: 传 parent_file_path(原 PDF 路径), 插件端据此识别原附件是否为链接附件,
+                    # 是则译文放到原 PDF 同目录并做成链接附件(跟随 zotmoov 等管理的位置), 否则沿用 imported 逻辑
+                    ok, msg = zotero_auto_link(item_key, src, title, parent_file_path=file_path)
                     _dbg_write(f"    zotero_auto_link → ok={ok} msg={msg!r}")
                     # v2.3.7 修正: zotero_auto_link 内部吞掉了所有异常, 失败时返回 (False, msg) 而不是抛出,
                     # 之前只判断"有没有抛异常"永远为真, 会把失败误判成功导致该删的没删/该兜底的没兜底
                     if ok:
                         linked = True
+                        self._zotero_writeback_ok = True
                     else:
                         try: self.prog_detail.setText(f"⚠️ {msg}")
                         except Exception: pass
@@ -4167,13 +4212,17 @@ class TranslatePage(QWidget):
                         pass
             else:
                 # 兜底: 关联失败(插件没响应/未装)时落一份到原文献文件夹方便手动找到; 绝不删 src
-                dst = os.path.join(zotero_dir, os.path.basename(src))
-                if os.path.abspath(src) != os.path.abspath(dst):
-                    try:
-                        shutil.copy2(src, dst)
-                        _dbg_write(f"    ⚠ fallback copied to {dst!r}(关联失败, 留本地兜底)")
-                    except Exception as e:
-                        _dbg_write(f"    ✗ fallback copy failed: {e}")
+                if zotero_dir:
+                    dst = os.path.join(zotero_dir, os.path.basename(src))
+                    if os.path.abspath(src) != os.path.abspath(dst):
+                        try:
+                            shutil.copy2(src, dst)
+                            _dbg_write(f"    ⚠ fallback copied to {dst!r}(关联失败, 留本地兜底)")
+                        except Exception as e:
+                            _dbg_write(f"    ✗ fallback copy failed: {e}")
+                else:
+                    # v1.0.20: 链接附件场景没有 storage 目录, 不做兜底复制
+                    _dbg_write(f"    ⚠ no zotero_dir for linked attachment, skip fallback copy")
 
     def _on_batch_done(self):
         """全部文件翻译完成"""
@@ -4185,7 +4234,9 @@ class TranslatePage(QWidget):
         total = len(self._batch_results)
         ok = sum(1 for _, r in self._batch_results if r is not None)
         failed = total - ok
-        has_zotero = any(detect_zotero_source(fp) for fp, _ in self._batch_results)
+        # v1.0.20: 链接附件(zotmoov 等移动过)也能回写成功, 用回写标记而不是只靠 storage 路径判断
+        has_zotero = any(detect_zotero_source(fp) for fp, _ in self._batch_results) \
+            or getattr(self, "_zotero_writeback_ok", False)
 
         # 收集失败的文件用于重试
         self._failed_files = [fp for fp, r in self._batch_results if r is None]
@@ -5725,15 +5776,23 @@ class SettingsPage(QWidget):
 
     def _install_zotero_plugin(self):
         """一键安装 pdf2zh Connector 到 Zotero"""
-        import glob, shutil, subprocess
+        import glob, shutil, subprocess, sys
         xpi = _res('assets', 'pdf2zh-connector.xpi')
         if not os.path.exists(xpi):
             self._zot_status.setText("插件文件缺失")
             self._zot_status.setStyleSheet("color:#FF3B30;")
             return
-        # 查找 Zotero profile 目录
-        profiles_dir = os.path.expanduser("~/Library/Application Support/Zotero/Profiles")
-        profiles = glob.glob(os.path.join(profiles_dir, "*.default*"))
+        # 查找 Zotero profile 目录（macOS / Windows / Linux）
+        profile_roots = []
+        if sys.platform == "darwin":
+            profile_roots.append(os.path.expanduser("~/Library/Application Support/Zotero/Profiles"))
+        elif os.name == "nt":
+            profile_roots.append(os.path.expanduser(r"~/AppData/Roaming/Zotero/Zotero/Profiles"))
+        else:
+            profile_roots.append(os.path.expanduser("~/.zotero/zotero"))
+        profiles = []
+        for _root in profile_roots:
+            profiles.extend(glob.glob(os.path.join(_root, "*.default*")))
         if not profiles:
             self._zot_status.setText("找不到 Zotero 配置目录")
             self._zot_status.setStyleSheet("color:#FF3B30;")
@@ -5780,9 +5839,19 @@ class SettingsPage(QWidget):
             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes
         )
         if reply == QMessageBox.Yes:
-            subprocess.run(["pkill", "-x", "zotero"], capture_output=True)
-            subprocess.run(["pkill", "-x", "Zotero"], capture_output=True)
-            QTimer.singleShot(2000, lambda: subprocess.Popen(["open", "-a", "Zotero"]))
+            if sys.platform == "darwin":
+                subprocess.run(["pkill", "-x", "zotero"], capture_output=True)
+                subprocess.run(["pkill", "-x", "Zotero"], capture_output=True)
+                QTimer.singleShot(2000, lambda: subprocess.Popen(["open", "-a", "Zotero"]))
+            elif os.name == "nt":
+                subprocess.run(["taskkill", "/IM", "zotero.exe", "/F"], capture_output=True)
+                _zot_exe = _find_zotero_exe_windows()
+                if _zot_exe:
+                    QTimer.singleShot(2000, lambda: subprocess.Popen([_zot_exe]))
+                else:
+                    QMessageBox.information(self, "请手动重启", "Zotero 已退出，请手动重新打开 Zotero。")
+            else:
+                subprocess.run(["pkill", "-x", "zotero"], capture_output=True)
             QTimer.singleShot(10000, self._check_zotero_plugin)
             self._zot_status.setText("正在重启 Zotero…")
             self._zot_status.setStyleSheet("color:#0071E3;")
@@ -6886,6 +6955,14 @@ def main():
                 if fmt:
                     tp._cli_format = fmt
                     _dbg_write(f"  set _cli_format={fmt}")
+
+                # v1.0.20: Zotero 附件元数据(链接附件回写用)
+                zkey = payload.get("zotero_key")
+                if zkey:
+                    tp._cli_zotero_key = zkey
+                    _dbg_write(f"  set _cli_zotero_key={zkey}")
+                if payload.get("zotero_link_mode") is not None:
+                    tp._cli_zotero_link_mode = payload["zotero_link_mode"]
 
                 # v2.3.13: 记录本次是否由 --auto/Zotero 唤起触发（无人值守），翻译完成后
                 # 弹出的持久提示（表格翻译结果等）要避免在这种场景下阻塞主线程等人来点掉。

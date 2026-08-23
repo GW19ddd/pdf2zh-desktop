@@ -60,12 +60,12 @@
 │  _resolve_zotero_path(...)       ← 路径拼接             │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
-│              assets/zotero-plugin/                       │
+│              assets/pdf2zh-connector.xpi                 │
 │                                                         │
-│  manifest.json    ← Zotero 插件清单                     │
-│  bootstrap.js     ← 注册 HTTP 端点                      │
-│    POST /pdf2zh/attach  ← 添加附件                      │
-│    GET  /pdf2zh/ping    ← 健康检查                      │
+│  v1.0.30 构建产物（源码在 zotero-plugin-template/）      │
+│    右键菜单 + 设置面板 + HTTP 端点                       │
+│    POST /pdf2zh/attach  ← 导入/链接译文附件              │
+│    GET  /pdf2zh/ping    ← 健康检查                       │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -310,25 +310,33 @@ self._zot_keep_copy = QCheckBox("同时保留输出目录副本")  # 默认勾�
 
 ---
 
-## 四、Zotero 插件（assets/zotero-plugin/）
+## 四、Zotero 插件（zotero-plugin-template/ → assets/pdf2zh-connector.xpi）
 
-这个插件是**可选的**，不安装也能用基本功能（文件回写）。安装后增加"自动关联附件"能力。
+这个插件是**可选的**，不装也能用基本功能（文件回写）。安装后增加“自动关联附件 + 右键直接翻译”能力。
 
-### 文件结构
+### 文件结构（v1.0.30 起）
 ```
-assets/zotero-plugin/
-├── manifest.json      ← 插件元数据
-└── bootstrap.js       ← 注册两个 HTTP 端点
+zotero-plugin-template/          # 插件源码（TypeScript，zotero-plugin-scaffold 构建）
+├─ src/modules/httpEndpoints.ts  # POST /pdf2zh/attach + GET /pdf2zh/ping
+├─ src/modules/menus.ts          # 条目树 / PDF 阅读器右键菜单
+├─ src/modules/prefs.ts          # 插件设置面板（Zotero → 设置 → pdf2zh 翻译）
+└─ ...                           
+assets/pdf2zh-connector.xpi      # 构建产物（v1.0.30），随 app 一起分发
 ```
 
 ### 插件做了什么
-1. `POST /pdf2zh/attach` — 接收 `{itemKey, filePath, title}`，调用 `Zotero.Attachments.importFromFile` 把译文添加为附件
+1. `POST /pdf2zh/attach` — 接收 `{itemKey, filePath, title, parentFilePath}`：
+   - 按 `itemKey` 找到原附件，读取 `attachmentLinkMode`
+   - 普通附件（`linkMode=0`）→ `importFromFile` 导入 storage
+   - **链接附件**（`linkMode=2`，zotmoov / 手动移动过、不在 storage 里）→ `linkFromFile` 放到原 PDF 同目录
 2. `GET /pdf2zh/ping` — 健康检查，返回 `{"status": "ok"}`
 
 ### 安装方式
-Zotero → 工具 → 附加组件 → 从文件安装 → 选择 `zotero-plugin` 目录下的 `.xpi` 文件（或直接拖入）
+- 桌面端设置页 → Zotero 联动 → 「一键安装 Zotero 插件」，或
+- Zotero → 工具 → 附加组件 → 齿轮 → 从文件安装插件 → 选择 `assets/pdf2zh-connector.xpi`，重启 Zotero
 
-**Win 版不需要改插件代码**，`bootstrap.js` 是纯 Zotero API，跨平台通用。只需确保打包时 `assets/zotero-plugin/` 目录随 app 一起分发。
+**Win 版不需要改插件代码**：插件由 `zotero-plugin-template/` 构建后随 app 分发。
+构建命令：`cd zotero-plugin-template && npm run build`，产物在 `.scaffold/build/pdf2zh-connector-vX.Y.Z.xpi`。
 
 ---
 
@@ -466,8 +474,8 @@ Mac 版中与 Zotero 相关的所有文件和代码位置：
 | `ui/main_window.py` | `TranslatePage._check_zotero_source()` (L3010) | 提示条控制 |
 | `ui/main_window.py` | `TranslatePage._zotero_writeback()` (L3197) | 回写核心 |
 | `ui/main_window.py` | `SettingsPage` (~L4230) | Zotero 设置卡片 |
-| `assets/zotero-plugin/manifest.json` | — | Zotero 插件清单 |
-| `assets/zotero-plugin/bootstrap.js` | — | Zotero 插件代码 |
+| `assets/pdf2zh-connector.xpi` | — | Zotero 插件构建产物（v1.0.30） |
+| `zotero-plugin-template/src/` | — | Zotero 插件源码（TypeScript） |
 
 > 行号基于 2026-04-06 的 Mac 版代码，可能随后续更新变化。建议用函数名搜索定位。
 

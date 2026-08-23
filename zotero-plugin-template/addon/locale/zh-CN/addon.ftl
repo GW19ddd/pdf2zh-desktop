@@ -1,0 +1,10 @@
+startup-finish = pdf2zh-desktop Connector 已就绪
+menu-translate-label = 📖 用 pdf2zh-desktop 翻译
+menu-one-click = 一键翻译（默认格式 · 见设置）
+menu-side-by-side = 只出「中外并排」（side by side）
+menu-dual = 只出「上下双语」（dual）
+menu-mono = 只出「纯中文」（mono）
+menu-all = 出全部 3 种格式
+menu-silent = 后台静默翻译（不弹窗，完成自动关闭）
+prefs-title = pdf2zh 翻译
+menu-open-config = 打开 pdf2zh-desktop 手动配置
