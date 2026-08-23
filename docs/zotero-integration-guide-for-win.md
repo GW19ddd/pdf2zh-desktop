@@ -321,7 +321,7 @@ zotero-plugin-template/          # 插件源码（TypeScript，zotero-plugin-sca
 ├─ src/modules/menus.ts          # 条目树 / PDF 阅读器右键菜单
 ├─ src/modules/prefs.ts          # 插件设置面板（Zotero → 设置 → pdf2zh 翻译）
 └─ ...                           
-assets/pdf2zh-connector.xpi      # 构建产物（v1.0.30），随 app 一起分发
+assets/pdf2zh-connector.xpi      # 构建产物（v1.0.0），随 app 一起分发
 ```
 
 ### 插件做了什么
@@ -474,7 +474,7 @@ Mac 版中与 Zotero 相关的所有文件和代码位置：
 | `ui/main_window.py` | `TranslatePage._check_zotero_source()` (L3010) | 提示条控制 |
 | `ui/main_window.py` | `TranslatePage._zotero_writeback()` (L3197) | 回写核心 |
 | `ui/main_window.py` | `SettingsPage` (~L4230) | Zotero 设置卡片 |
-| `assets/pdf2zh-connector.xpi` | — | Zotero 插件构建产物（v1.0.30） |
+| `assets/pdf2zh-connector.xpi` | — | Zotero 插件构建产物（v1.0.0） |
 | `zotero-plugin-template/src/` | — | Zotero 插件源码（TypeScript） |
 
 > 行号基于 2026-04-06 的 Mac 版代码，可能随后续更新变化。建议用函数名搜索定位。

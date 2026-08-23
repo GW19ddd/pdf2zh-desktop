@@ -1,5 +1,5 @@
 """
-pdf2zh 桌面版启动器
+PaperFlow 启动器
 由 pdf2zh.vbs 调用，使用 pythonw.exe 运行（无控制台窗口）
 错误写入日志文件，并通过 Qt 对话框提示用户
 """
@@ -141,7 +141,7 @@ def _parse_cli_args(argv):
 
 
 def main():
-    log("=== pdf2zh 桌面版启动 ===")
+    log("=== PaperFlow 启动 ===")
     log(f"Python: {sys.version}")
     log(f"工作目录: {os.getcwd()}")
 
@@ -209,62 +209,96 @@ def main():
         builtins._pdf2zh_dpr_scale = 1.0 / max(1.0, dpr ** 0.6)  # 高分屏更强补偿
 
         def build_stylesheet(base_font=14):
-            """根据基准字号生成完整样式表（所有尺寸等比联动，DPR 自动补偿）"""
+            """根据基准字号生成完整样式表（macOS 浅色风，所有尺寸等比联动，DPR 自动补偿）"""
             dpr_scale = getattr(builtins, '_pdf2zh_dpr_scale', 1.0)
             f = max(8, round(base_font * dpr_scale))  # DPR 补偿后的实际字号（下限 8px）
-            f1 = f + 1             # GroupBox 标题
-            fs = f - 1             # 辅助文字
+            f1 = f + 1             # 卡片标题
             ft = f + 2             # Tooltip
-            pad_v = max(3, f // 3) # 垂直内边距
-            pad_h = max(6, f // 2) # 水平内边距
-            r = max(3, f // 3)     # 圆角
-            r2 = r + 2             # 大圆角
-            ind = f                # checkbox indicator
+            pad_v = max(4, f // 3) # 垂直内边距
+            pad_h = max(8, f // 2) # 水平内边距
+            r = max(6, f // 2)     # 控件圆角（胶囊感）
+            rc = max(10, f * 3 // 4)  # 卡片圆角
+            ind = max(15, f)       # checkbox indicator
             bw = max(1, f // 14)   # 边框宽度
-            sp = max(4, f // 3)    # checkbox spacing
+            sp = max(5, f // 3)    # checkbox spacing
+            check_img = (APP_DIR / "assets" / "pf-check.png").as_posix()
+            radio_img = (APP_DIR / "assets" / "pf-radio.png").as_posix()
+            chevron_img = (APP_DIR / "assets" / "pf-chevron-down.png").as_posix()
             return f"""
-            * {{ font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif; font-size: {f}px; }}
-            QMainWindow {{ background: #fafbfc; }}
-            QGroupBox {{ font-weight: bold; font-size: {f1}px; color: #333;
-                border: {bw}px solid #e0e4ea; border-radius: {r2}px; margin-top: {sp+4}px; padding-top: {f}px; }}
-            QGroupBox::title {{ subcontrol-origin: margin; left: {pad_h+4}px; padding: 0 {sp}px; color: #4169E1; }}
-            QPushButton {{ border: {bw}px solid #d0d5dd; border-radius: {r}px; padding: {pad_v}px {pad_h}px; background: white; }}
-            QPushButton:hover {{ background: #f0f4ff; border-color: #4169E1; }}
-            QPushButton:pressed {{ background: #e0e8ff; }}
-            QPushButton:disabled {{ background: #f5f5f5; color: #aaa; border-color: #e0e0e0; }}
-            QComboBox {{ border: {bw}px solid #d0d5dd; border-radius: {r}px; padding: {pad_v}px {pad_h}px; background: white; }}
-            QComboBox:hover {{ border-color: #4169E1; }}
-            QComboBox QAbstractItemView {{ border: {bw}px solid #d0d5dd; border-radius: {r}px;
-                background: white; selection-background-color: #e8eeff; selection-color: #333; padding: 2px; }}
-            QLineEdit {{ border: {bw}px solid #d0d5dd; border-radius: {r}px; padding: {pad_v}px {pad_h}px; background: white; }}
-            QLineEdit:focus {{ border-color: #4169E1; }}
-            QSpinBox {{ border: {bw}px solid #d0d5dd; border-radius: {r}px; padding: {pad_v-1}px {sp}px; background: white; }}
+            * {{ font-family: "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif; font-size: {f}px; color: #1D1D1F; }}
+            QMainWindow {{ background: transparent; }}
+            QDialog {{ background: #F5F5F7; }}
+            #rootCard {{ background: #F5F5F7; border-radius: {rc}px; }}
+            #rootCard[maximized="true"] {{ border-radius: 0px; }}
+            QGroupBox {{ background: #FFFFFF; border: {bw}px solid #E8E8ED; border-radius: {rc}px;
+                margin-top: {sp+6}px; padding: {f}px {pad_h}px {pad_v}px {pad_h}px; font-weight: 600; color: #1D1D1F; }}
+            QGroupBox::title {{ subcontrol-origin: margin; left: {pad_h+4}px; padding: 0 {sp}px; color: #1D1D1F; font-size: {f1}px; }}
+            QPushButton {{ background: #FFFFFF; color: #1D1D1F; border: {bw}px solid #D7D7DC; border-radius: {r}px;
+                padding: {pad_v}px {pad_h}px; }}
+            QPushButton:hover {{ background: #F2F2F4; border-color: #C7C7CC; }}
+            QPushButton:pressed {{ background: #E8E8ED; }}
+            QPushButton:disabled {{ background: #F5F5F7; color: #AEAEB2; border-color: #EBEBEE; }}
+            QPushButton#translateBtn {{ background: #0071E3; color: #FFFFFF; border: none; border-radius: {r}px;
+                padding: {pad_v+1}px {pad_h+4}px; font-weight: 600; }}
+            QPushButton#translateBtn:hover {{ background: #0077ED; }}
+            QPushButton#translateBtn:pressed {{ background: #006EDB; }}
+            QPushButton#translateBtn:disabled {{ background: #C7C7CC; color: #FFFFFF; }}
+            QComboBox {{ background: #FFFFFF; border: {bw}px solid #D7D7DC; border-radius: {r}px; padding: {pad_v-1}px {pad_h}px; }}
+            QComboBox:hover {{ border-color: #B0B0B6; }}
+            QComboBox:focus {{ border-color: #0071E3; }}
+            QComboBox::drop-down {{ border: none; width: {pad_h+8}px; }}
+            QComboBox::down-arrow {{ image: url("{chevron_img}"); width: {max(10, f-2)}px; height: {max(10, f-2)}px; }}
+            QComboBox QAbstractItemView {{ background: #FFFFFF; border: {bw}px solid #E3E3E8; border-radius: {r+2}px;
+                padding: 4px; selection-background-color: #E8F1FD; selection-color: #1D1D1F; outline: 0; }}
+            QLineEdit {{ background: #FFFFFF; border: {bw}px solid #D7D7DC; border-radius: {r}px; padding: {pad_v-1}px {pad_h}px; }}
+            QLineEdit:hover {{ border-color: #B0B0B6; }}
+            QLineEdit:focus {{ border-color: #0071E3; }}
+            QSpinBox {{ background: #FFFFFF; border: {bw}px solid #D7D7DC; border-radius: {r}px; padding: {pad_v-2}px {sp}px; }}
+            QSpinBox:focus {{ border-color: #0071E3; }}
+            QTextEdit {{ background: #FFFFFF; border: {bw}px solid #D7D7DC; border-radius: {r+2}px; padding: 2px; }}
+            QTextEdit:focus {{ border-color: #0071E3; }}
             QCheckBox {{ spacing: {sp}px; }}
-            QCheckBox::indicator {{ width: {ind}px; height: {ind}px; border: {bw}px solid #c8cdd4; border-radius: {max(2, r // 2)}px; background: white; }}
-            QCheckBox::indicator:hover {{ border-color: #4169E1; }}
-            QCheckBox::indicator:checked {{ background: #4169E1; border-color: #4169E1; }}
-            QListWidget {{ border: {bw}px solid #e0e4ea; border-radius: {r}px; background: white; }}
-            QListWidget::item {{ padding: {pad_v-1}px {sp}px; }}
-            QListWidget::item:selected {{ background: #e8eeff; color: #333; }}
-            QTextEdit {{ border: {bw}px solid #d0d5dd; border-radius: {r}px; background: white; }}
-            QTextEdit:focus {{ border-color: #4169E1; }}
-            QProgressBar {{ border: none; border-radius: {r}px; background: #e8ecf4; }}
-            QProgressBar::chunk {{ background: #4169E1; border-radius: {r}px; }}
-            QTabBar::tab {{ font-size: {f}px; padding: {pad_h}px {sp}px; border: none; border-bottom: 2px solid transparent; }}
-            QTabBar::tab:selected {{ font-weight: bold; color: #4169E1; border-bottom: 2px solid #4169E1; background: white; }}
-            QTabBar::tab:!selected {{ color: #666; }}
-            QTabBar::tab:hover:!selected {{ color: #333; }}
-            QTabWidget::pane {{ border: {bw}px solid #d0d5dd; border-radius: 0 0 {r2}px {r2}px; background: white; }}
+            QCheckBox::indicator {{ width: {ind}px; height: {ind}px; border: {bw}px solid #B8B8BD; border-radius: {max(5, ind // 3)}px; background: #FFFFFF; }}
+            QCheckBox::indicator:hover {{ border-color: #0071E3; }}
+            QCheckBox::indicator:checked {{ background: #0071E3; border-color: #0071E3; image: url("{check_img}"); }}
+            QCheckBox::indicator:checked:hover {{ background: #0077ED; }}
+            QRadioButton {{ spacing: {sp}px; }}
+            QRadioButton::indicator {{ width: {ind}px; height: {ind}px; border: {bw}px solid #B8B8BD; border-radius: {ind // 2}px; background: #FFFFFF; }}
+            QRadioButton::indicator:hover {{ border-color: #0071E3; }}
+            QRadioButton::indicator:checked {{ border: none; image: url("{radio_img}"); }}
+            QListWidget {{ background: #FFFFFF; border: {bw}px solid #E8E8ED; border-radius: {rc-2}px; padding: 4px; }}
+            QListWidget::item {{ padding: {pad_v}px {pad_h-2}px; border-radius: {r-2}px; margin: 1px 2px; }}
+            QListWidget::item:hover {{ background: #F2F2F4; }}
+            QListWidget::item:selected {{ background: #E8F1FD; color: #1D1D1F; }}
+            QListWidget::item:selected:active {{ background: #E8F1FD; }}
+            QProgressBar {{ background: #E8E8ED; border: none; border-radius: {max(3, ind // 5)}px; }}
+            QProgressBar::chunk {{ background: #0071E3; border-radius: {max(3, ind // 5)}px; }}
+            QTabBar::tab {{ font-size: {f}px; padding: {pad_h}px {sp}px; border: none; color: #6E6E73; }}
+            QTabBar::tab:selected {{ color: #1D1D1F; font-weight: 600; }}
+            QTabWidget::pane {{ background: #FFFFFF; border: {bw}px solid #E8E8ED; border-radius: {rc-2}px; }}
             QScrollArea {{ border: none; background: transparent; }}
-            QScrollBar:vertical {{ width: {max(10, f-2)}px; }}
-            QScrollBar:horizontal {{ height: {max(10, f-2)}px; }}
-            QToolTip {{ background: #FFFDF0; color: #333; border: {bw}px solid #D4C89A;
-                border-radius: {r2+2}px; padding: {pad_h}px {pad_h+4}px;
-                font-family: "Microsoft YaHei"; font-size: {ft}px; }}
-            QPushButton#translateBtn {{ background: #165DFF; color: white; font-size: {f}px;
-                padding: {pad_v}px {pad_h}px; border-radius: {r}px; border: none; }}
-            QPushButton#translateBtn:hover {{ background: #0E42D2; }}
-            QPushButton#translateBtn:disabled {{ background: #ccc; color: #888; }}
+            QScrollArea > QWidget > QWidget {{ background: transparent; }}
+            QScrollBar:vertical {{ background: transparent; width: {max(8, f-2)}px; margin: 2px; }}
+            QScrollBar::handle:vertical {{ background: rgba(120,120,128,0.45); min-height: 28px; border-radius: {max(3, f // 4)}px; }}
+            QScrollBar::handle:vertical:hover {{ background: rgba(120,120,128,0.7); }}
+            QScrollBar:horizontal {{ background: transparent; height: {max(8, f-2)}px; margin: 2px; }}
+            QScrollBar::handle:horizontal {{ background: rgba(120,120,128,0.45); min-width: 28px; border-radius: {max(3, f // 4)}px; }}
+            QScrollBar::handle:horizontal:hover {{ background: rgba(120,120,128,0.7); }}
+            QScrollBar::add-line, QScrollBar::sub-line {{ width: 0; height: 0; }}
+            QScrollBar::add-page, QScrollBar::sub-page {{ background: transparent; }}
+            QToolTip {{ background: #2C2C2E; color: #FFFFFF; border: {bw}px solid #3A3A3C; border-radius: {r}px;
+                padding: {pad_v}px {pad_h}px; font-size: {ft}px; }}
+            QMenu {{ background: #FFFFFF; border: {bw}px solid #E3E3E8; border-radius: {r+2}px; padding: 6px; }}
+            QMenu::item {{ padding: {pad_v+1}px {pad_h+10}px; border-radius: {r-2}px; }}
+            QMenu::item:selected {{ background: #E8F1FD; color: #1D1D1F; }}
+            QMenu::separator {{ height: 1px; background: #E8E8ED; margin: 4px 8px; }}
+            QSplitter::handle {{ background: transparent; width: 6px; }}
+            QWidget#macTitleBar {{ background: transparent; }}
+            QLabel#macTitle {{ background: transparent; color: #1D1D1F; font-size: 13px; font-weight: 600; }}
+            QLabel#macVersion {{ background: transparent; color: #8E8E93; font-size: 11px; }}
+            QWidget#sidebarNav {{ background: transparent; }}
+            QPushButton#navBtn {{ background: transparent; border: none; }}
+            QLabel#navVersion {{ background: transparent; color: #AEAEB2; font-size: 10px; }}
             """
 
         # 存为全局函数供字号切换时调用
@@ -364,12 +398,12 @@ def main():
     except ImportError as e:
         msg = f"模块导入失败: {e}\n\n请检查 core\\site-packages 是否完整。"
         log(f"[ERROR] {msg}\n{traceback.format_exc()}")
-        show_error_dialog("pdf2zh - 启动失败", msg)
+        show_error_dialog("PaperFlow - 启动失败", msg)
         sys.exit(1)
     except Exception as e:
         msg = f"程序启动失败: {e}"
         log(f"[ERROR] {msg}\n{traceback.format_exc()}")
-        show_error_dialog("pdf2zh - 运行错误", msg)
+        show_error_dialog("PaperFlow - 运行错误", msg)
         sys.exit(1)
 
 

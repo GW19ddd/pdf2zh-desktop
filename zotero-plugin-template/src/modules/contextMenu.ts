@@ -81,7 +81,7 @@ export async function triggerTranslate(
     debugLog("selected pdf count=" + infos.length);
     if (infos.length === 0) {
       alertUser(
-        "pdf2zh-desktop Connector",
+        "PaperFlow Connector",
         "请先选中一个 PDF 附件或含 PDF 的文献条目\n(pdf2zh-desktop Connector)"
       );
       return;
@@ -95,7 +95,7 @@ export async function triggerTranslate(
       "triggerTranslate EXCEPTION: " + e + " stack=" + (e && e.stack ? e.stack : "no-stack")
     );
     alertUser(
-      "pdf2zh-desktop Connector",
+      "PaperFlow Connector",
       "右键翻译失败：\n" + String(e) + "\n\n日志已写到：" + debugLogPath()
     );
   }
@@ -106,17 +106,17 @@ async function triggerReaderTranslate(reader: any, format: string | null, auto: 
   try {
     const itemID = reader && reader.itemID;
     if (!itemID) {
-      alertUser("pdf2zh-desktop Connector", "未找到当前打开的 PDF（reader）");
+      alertUser("PaperFlow Connector", "未找到当前打开的 PDF（reader）");
       return;
     }
     const item = Zotero.Items.get(itemID);
     if (!item || item.attachmentContentType !== "application/pdf") {
-      alertUser("pdf2zh-desktop Connector", "当前 reader 打开的附件不是 PDF");
+      alertUser("PaperFlow Connector", "当前 reader 打开的附件不是 PDF");
       return;
     }
     const p = await item.getFilePathAsync();
     if (!p) {
-      alertUser("pdf2zh-desktop Connector", "无法获取当前 PDF 的文件路径");
+      alertUser("PaperFlow Connector", "无法获取当前 PDF 的文件路径");
       return;
     }
     debugLog("=== triggerReaderTranslate file=" + p + " format=" + format + " ===");
@@ -127,7 +127,7 @@ async function triggerReaderTranslate(reader: any, format: string | null, auto: 
     });
   } catch (e: any) {
     debugLog("triggerReaderTranslate EXCEPTION: " + e);
-    alertUser("pdf2zh-desktop Connector", "reader 翻译失败：\n" + String(e));
+    alertUser("PaperFlow Connector", "reader 翻译失败：\n" + String(e));
   }
 }
 type TranslateHandler = (format: string | null, auto: boolean) => void;

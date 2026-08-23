@@ -2,12 +2,12 @@
 
 <br>
 
-<img src="assets/icon.png" width="128" height="128" alt="pdf2zh" style="border-radius: 22px;">
+<img src="assets/icon.png" width="128" height="128" alt="PaperFlow" style="border-radius: 22px;">
 
 <br>
 <br>
 
-# 📖 pdf2zh-desktop · pdf2zh 桌面版 v2.3.17
+# 🌿 PaperFlow · PDF 翻译工作台 v2.3.17
 
 ### 开箱即用的 PDF 学术翻译神器 🚀
 
@@ -23,11 +23,11 @@
 <br>
 
 <table align="center"><tr><td align="center" style="padding:18px 28px">
-<h3>📘 强烈推荐先看 → <a href="https://aarongig.github.io/pdf2zh-desktop/">完整图文使用教程（macOS）</a></h3>
+<h3>📘 强烈推荐先看 → <a href="https://gw19ddd.github.io/pdf2zh-desktop/">完整图文使用教程（macOS）</a></h3>
 <p>真实截图 · 每一步带红圈编号 · 配 API · 扫描件处理 · 常见问题<br>
 <b>第一次使用？看完这一份就够了，省下你折腾两小时的时间。</b><br>
 💬 <i>页面右下角有 AI 客服「小黑猫」在线答疑，问任何使用问题都能秒回</i></p>
-<a href="https://aarongig.github.io/pdf2zh-desktop/"><img src="https://img.shields.io/badge/📘 点 这 里 看 教 程-FF6B35?style=for-the-badge&logoColor=white" alt="使用教程"></a>
+<a href="https://gw19ddd.github.io/pdf2zh-desktop/"><img src="https://img.shields.io/badge/📘 点 这 里 看 教 程-FF6B35?style=for-the-badge&logoColor=white" alt="使用教程"></a>
 </td></tr></table>
 
 <br>
@@ -129,7 +129,7 @@
 - 📎 **自动关联**：翻译完成后译文自动添加为 Zotero 附件，不留冗余副本
 - 🔌 **一键安装插件**：设置页一键安装 pdf2zh Connector（Windows / macOS），开箱即用
 - 📐 **格式多选**：左右并排 / 双语对照 / 仅译文，任意组合放回 Zotero
-- 🖱️ **右键直接翻译**：Zotero 条目树或 PDF 阅读器内对 PDF 右键 → 「📖 用 pdf2zh-desktop 翻译」，格式跟随右键菜单选择
+- 🖱️ **右键直接翻译**：Zotero 条目树或 PDF 阅读器内对 PDF 右键 → 「📖 用 PaperFlow 翻译」，格式跟随右键菜单选择
 - 🌙 **后台静默翻译**：右键菜单勾选后不弹窗、不抢焦点，翻完自动关窗
 
 ### 📖 PDF 预览 & 历史记录
@@ -214,7 +214,7 @@
 
 **更快的方式：Zotero 里右键直接翻译**
 
-不用打开 pdf2zh——在 Zotero 里对着 PDF **右键 → 「📖 用 pdf2zh-desktop 翻译」**即可：
+不用打开 pdf2zh——在 Zotero 里对着 PDF **右键 → 「📖 用 PaperFlow 翻译」**即可：
 
 - **条目树右键**：选中一个或多个 PDF 附件（或含 PDF 的文献条目）直接翻译，格式可单独选：中外并排 / 上下双语 / 纯中文 / 全部 3 种
 - **PDF 阅读器内右键**：正在阅读的 PDF 也能右键翻译
@@ -225,8 +225,8 @@
 
 - 默认翻译格式：中外并排 / 上下双语 / 纯中文 / 全部 3 种
 - 静默翻译开关、翻译完成后在 Zotero 中定位该文献
-- pdf2zh 程序路径：自动探测 / 手动浏览（找不到应用时会弹窗引导手动选择一次，之后记住）
-- 插件版本 v1.0.31，兼容 Zotero 7 / 8 / 9，支持自动更新（updates.json）
+- PaperFlow 程序路径：自动探测 / 手动浏览（找不到应用时会弹窗引导手动选择一次，之后记住）
+- 插件版本 v1.0.0（PaperFlow Connector for Zotero），兼容 Zotero 7 / 8 / 9，支持自动更新（updates.json）
 
 ---
 
@@ -285,17 +285,23 @@
 | 怎么用 DeepSeek？ | 选 DeepSeek → 填 API Key → 选模型 |
 | 怎么用自己的 API？ | 选「OpenAI 兼容格式」→ 快捷预设一键配置 |
 | 怎么保证术语准确？ | 展开「术语库」→ 选学科模板或自定义 |
-| Zotero 翻译后没显示附件？ | 设置页点「一键安装插件」或从 Releases 下载最新 pdf2zh Connector xpi（v1.0.31） |
+| Zotero 翻译后没显示附件？ | 设置页点「一键安装插件」或从 Releases 下载最新 pdf2zh Connector xpi（v1.0.0） |
 
 ---
 
 ## 📋 更新日志
 
+### v2.3.17（2026-08-24）— PaperFlow 品牌焕新
+
+- 🎨 **UI 全面重绘为 macOS 风格**：无边框圆角窗口、自绘标题栏（红绿灯按钮）、左侧图标导航、浅色毛玻璃卡片、胶囊按钮、系统蓝强调色
+- ✨ **软件更名 PaperFlow**，插件更名 **PaperFlow Connector for Zotero**（v1.0.0，作者 gw）
+- 📦 插件 ID 更新为 `paperflow-connector@gw.com`：请在 Zotero 中先卸载旧插件，再安装新 xpi（`paperflow-connector-v1.0.0.xpi`）
+
 ### v2.3.17（2026-08-24）— Zotero 联动修复
 
 - 🔧 **修复右键翻译后「Zotero 联动失败」**：桌面端回写函数 `zotero_writeback` 未导入导致 `NameError`，且右键传入的 `--zotero-key` 未保存到窗口实例；现在链接附件（zotero 移动 / zotmoov 等场景）的译文会正确放回原 PDF 同目录并关联回条目
 - 🐛 **修复 Connector 插件链接附件判断**：Zotero 9 的 `LINK_MODE_LINKED_FILE` 常量是 `2`（此前误判为 `3`），链接附件译文改用 `linkFromFile` 放回原目录，不再被复制进 storage
-- ✨ **Connector 插件升级到 v1.0.31**：右键菜单、插件设置面板、自动更新（updates.json 指向本仓库）全部可用；`assets/pdf2zh-connector.xpi` 与 Release 产物同步
+- ✨ **Connector 插件全新改版 v1.0.0（PaperFlow Connector for Zotero）**：右键菜单、插件设置面板、自动更新（updates.json 指向本仓库）全部可用；`assets/pdf2zh-connector.xpi` 与 Release 产物同步
 - 🔧 **修复插件设置面板「浏览应用路径」无效**：Zotero 7/9 移除了扩展里的 `Components`，改用 `Zotero.FilePicker`，现在可以自己选择 `pdf2zh.exe` 路径（也支持手动输入）
 
 ### v2.3.16（2026-08-21）
@@ -433,9 +439,9 @@
 
 ## 👨‍💻 关于本项目
 
-**桌面版作者**：[@AaronGIG](https://github.com/AaronGIG) (CAS)
+**桌面版作者**：[@GW19ddd](https://github.com/GW19ddd) (CAS)
 
-桌面版的独立打包、GUI 增强、便携化改造、Zotero 联动等功能由 AaronGIG (CAS) 与 Claude (Anthropic AI) 协作开发完成 🤖✨
+桌面版的独立打包、GUI 增强、便携化改造、Zotero 联动等功能由 GW19ddd (CAS) 与 Claude (Anthropic AI) 协作开发完成 🤖✨
 
 **核心翻译引擎**：[PDFMathTranslate](https://github.com/Byaidu/PDFMathTranslate)（EMNLP 2025），感谢原项目的贡献 🤝
 

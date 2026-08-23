@@ -1,10 +1,10 @@
-startup-finish = pdf2zh-desktop Connector is ready
-menu-translate-label = 📖 Translate with pdf2zh-desktop
+startup-finish = PaperFlow Connector is ready
+menu-translate-label = 📖 Translate with PaperFlow
 menu-one-click = Translate (default format · see settings)
 menu-side-by-side = Only "side by side"
 menu-dual = Only "dual" (bilingual stacked)
 menu-mono = Only "mono" (Chinese only)
 menu-all = Generate all 3 formats
 menu-silent = Silent translate (no window, auto close)
-prefs-title = pdf2zh-desktop Connector
-menu-open-config = Open pdf2zh-desktop for manual configuration
+prefs-title = PaperFlow Connector for Zotero
+menu-open-config = Open PaperFlow for manual configuration

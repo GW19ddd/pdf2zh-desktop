@@ -55,7 +55,7 @@ export async function registerPrefsScripts(_window: Window): Promise<void> {
     } else if (p) {
       setHint("pref-exe-missing", "路径不存在，点击「自动探测」或「浏览」重新指定。");
     } else {
-      setHint("pref-exe-notfound", "未找到 pdf2zh 程序，点击「自动探测」或「浏览」手动选择。");
+      setHint("pref-exe-notfound", "未找到 PaperFlow 程序，点击「自动探测」或「浏览」手动选择。");
     }
   }
 
@@ -111,7 +111,7 @@ async function pickExecutable(cb: (path: string) => void): Promise<void> {
     // Zotero 7/9 已移除扩展里的 Components，改用 Zotero.FilePicker
     const FP: any = (Zotero as any).FilePicker;
     const fp = new FP();
-    fp.init(win, "选择 pdf2zh 程序", fp.modeOpen);
+    fp.init(win, "选择 PaperFlow 程序", fp.modeOpen);
     if (Zotero.isWin) {
       fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
       fp.appendFilters(fp.filterApps);

@@ -1,4 +1,4 @@
-# 📖 pdf2zh Desktop · Zero-Install PDF Academic Translator 🚀
+# 🌿 PaperFlow · Zero-Install PDF Academic Translator 🚀
 
 **🎉 No Python needed · No environment setup · Just download, unzip, and go!**
 
@@ -80,7 +80,7 @@ Tired of wrestling with Python environments just to translate a paper? Done with
 Translate PDFs directly from Zotero — the translated PDF is automatically added back to the item:
 
 - **One-click plugin install**: Settings → Zotero → "Install Zotero plugin" (Windows / macOS), then restart Zotero
-- **Right-click translate**: right-click a PDF attachment in the item tree or inside the PDF reader → "📖 用 pdf2zh-desktop 翻译" (Translate with pdf2zh-desktop)
+- **Right-click translate**: right-click a PDF attachment in the item tree or inside the PDF reader → "📖 用 PaperFlow 翻译" (Translate with pdf2zh-desktop)
 - **Formats**: side-by-side / dual / mono / all three — selectable right from the context menu
 - **Linked attachments**: if the original PDF lives outside Zotero storage (moved by zotmoov / attanger), the translation is placed next to it and linked back to the item (plugin v1.0.30+)
 - **Plugin settings panel**: Zotero → Settings → pdf2zh 翻译 — default format, silent translation, auto-locate item, app path
@@ -209,9 +209,9 @@ pdf2zh-desktop-win/
 
 ## 👨‍💻 About This Project
 
-**Desktop version author**: [@AaronGIG](https://github.com/AaronGIG) (CAS)
+**Desktop version author**: [@GW19ddd](https://github.com/GW19ddd) (CAS)
 
-The standalone packaging, GUI enhancements, portable design, and smart diagnostics were co-developed by AaronGIG (CAS) and Claude (Anthropic AI) 🤖✨
+The standalone packaging, GUI enhancements, portable design, and smart diagnostics were co-developed by GW19ddd (CAS) and Claude (Anthropic AI) 🤖✨
 
 **Core translation engine**: [PDFMathTranslate](https://github.com/Byaidu/PDFMathTranslate) (EMNLP 2025) — thanks to the original project 🤝
 

@@ -8,7 +8,7 @@ import { registerPrefsScripts } from "./modules/preferenceScript";
 import { installContextMenus, uninstallContextMenus } from "./modules/contextMenu";
 
 /**
- * pdf2zh-desktop Connector 生命周期：
+ * PaperFlow Connector 生命周期：
  *   startup       → 注册 HTTP 端点 + 设置面板 + 对已开窗口安装右键菜单
  *   主窗口加载    → 安装条目树右键菜单 + reader 菜单事件
  *   shutdown      → 全部反注册

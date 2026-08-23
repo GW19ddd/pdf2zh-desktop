@@ -181,10 +181,10 @@ function promptPickExecutable(): Promise<string | null> {
       try {
         const win = Zotero.getMainWindow();
         const yes = Services.prompt.confirm(win as any,
-          "pdf2zh-desktop Connector",
-          "没有自动找到 pdf2zh-desktop 应用。\n\n" +
-            "Windows: 请确认已把 pdf2zh-desktop-win 文件夹解压出来(里面有 pdf2zh.exe)。\n" +
-            "Mac: 确认 pdf2zh.app 在“应用程序”里。\n\n" +
+          "PaperFlow Connector",
+          "没有自动找到 PaperFlow 应用。\n\n" +
+            "Windows: 请确认已把应用文件夹解压出来(里面有 pdf2zh.exe)。\n" +
+            "Mac: 确认应用在“应用程序”里。\n\n" +
             "点“确定”手动选择 " +
             (Zotero.isWin ? "pdf2zh.exe" : "pdf2zh.app") +
             " 的位置(只需选一次)；\n" +
@@ -194,7 +194,7 @@ function promptPickExecutable(): Promise<string | null> {
           // Zotero 7/9 已移除扩展里的 Components，改用 Zotero.FilePicker
           const FP: any = (Zotero as any).FilePicker;
           const fp = new FP();
-          fp.init(win, "选择 pdf2zh 程序", fp.modeOpen);
+          fp.init(win, "选择 PaperFlow 程序", fp.modeOpen);
           if (Zotero.isWin) {
             fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
             fp.appendFilters(fp.filterApps);
@@ -214,10 +214,10 @@ function promptPickExecutable(): Promise<string | null> {
       }
       if (!picked) {
         alertUser(
-          "pdf2zh-desktop Connector",
-          "未找到 pdf2zh-desktop 应用。\n" +
-            "Windows: 把下载的 zip 解压, 确认有 pdf2zh-desktop-win\\pdf2zh.exe；建议解压到“下载”或“桌面”。\n" +
-            "Mac: 把 pdf2zh.app 放进“应用程序”。\n\n" +
+          "PaperFlow Connector",
+          "未找到 PaperFlow 应用。\n" +
+            "Windows: 把下载的 zip 解压, 确认有应用文件夹（内含 pdf2zh.exe）；建议解压到“下载”或“桌面”。\n" +
+            "Mac: 把应用放进“应用程序”。\n\n" +
             "下载：https://github.com/GW19ddd/pdf2zh-desktop/releases"
         );
       }
@@ -315,10 +315,10 @@ export async function launchPdf2zh(
   } catch (e) {
     debugLog("nsIProcess FAILED: " + e);
     alertUser(
-      "pdf2zh-desktop Connector",
-      "唤起 pdf2zh-desktop 失败：\n" +
+      "PaperFlow Connector",
+      "唤起 PaperFlow 失败：\n" +
         String(e) +
-        "\n\n临时办法：手动打开 pdf2zh-desktop 应用，把 PDF 拖进去。\n日志已写到 " + debugLogPath()
+        "\n\n临时办法：手动打开 PaperFlow 应用，把 PDF 拖进去。\n日志已写到 " + debugLogPath()
     );
   }
 }
