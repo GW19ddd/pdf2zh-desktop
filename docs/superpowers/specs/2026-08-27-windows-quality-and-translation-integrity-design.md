@@ -1,92 +1,92 @@
-# Windows Quality and Translation Integrity Design
+# Windows 版质量验证与翻译完整性设计
 
-## Purpose
+## 目标
 
-Improve the Windows-only desktop application in three connected areas: prevent silent translation loss, verify every user-facing control, and add a translation-integrity report that makes incomplete output visible and recoverable.
+本次工作只面向 Windows 桌面版，解决三个相互关联的问题：防止翻译内容静默缺失、验证所有用户可操作的界面控件，以及新增一份翻译完整性报告，让不完整的输出能够被发现和恢复。
 
-## Scope
+## 范围
 
-- Target Windows 10 and Windows 11 only.
-- Cover the PyQt5 application in `ui/`, the bundled `pdf2zh` translation pipeline in `core/site-packages/pdf2zh/`, configuration handling, PDF preview, history, AI tools, table translation, and Zotero integration.
-- Preserve existing output formats: mono, dual, and side-by-side.
-- Preserve current user changes and avoid unrelated refactoring.
-- Do not add macOS or Linux compatibility work.
+- 仅支持 Windows 10 和 Windows 11。
+- 覆盖 `ui/` 下的 PyQt5 界面、`core/site-packages/pdf2zh/` 下的翻译流程、配置、PDF 预览、历史记录、AI 功能、表格翻译和 Zotero 联动。
+- 保持纯译文、双语对照、左右并排三种输出格式。
+- 保留工作区中已有的用户修改，不进行无关重构。
+- 不处理 macOS 或 Linux 兼容性。
 
-“Every UI control” means every visible button, menu action, checkbox, combo box, editable field, list action, and navigation control that can be reached in a normal Windows session. Automated tests may simulate external services, dialogs, Explorer, Zotero, network access, and application restart; a smaller end-to-end matrix will exercise real local PDF operations.
+“验证全部 UI 控件”是指正常 Windows 使用过程中能够访问的按钮、菜单、复选框、下拉框、输入框、列表操作和导航控件。外部服务、系统对话框、资源管理器、Zotero、网络请求和应用重启主要采用模拟测试；本地 PDF 核心流程另外执行少量真实端到端测试。
 
-## Recommended Approach
+## 总体方案
 
-Use a layered test-and-fix approach. First create an inventory that detects unconnected or unreachable controls. Then add focused tests around each page and external boundary. Fix translation integrity at the shared translator layer so every output mode benefits. Finally add an integrity report to the existing completion flow instead of introducing a separate subsystem.
+采用分层验证方式。先建立界面控件清单，找出没有连接、无法触达或状态错误的控件；再为各页面和外部边界补充测试；随后在所有翻译服务共享的基础层修复翻译完整性；最后把完整性报告接入现有完成流程，不新建一套独立系统。
 
-This is preferred over a manual-only button review because it is repeatable, and over a broad UI rewrite because the current interface already contains the required workflows.
+不采用纯人工逐个点击，因为这种方式无法稳定重复；也不重写现有界面，因为当前界面已经具备需要验证的工作流程。
 
-## Translation Integrity
+## 翻译完整性
 
-### Long-input handling
+### 长文本处理
 
-Each translation provider declares its maximum request size. Inputs exceeding that limit are split at paragraph, sentence, whitespace, and hard-character boundaries, in that order. Formula placeholders such as `{v12}` remain atomic and chunks are translated in order before being joined.
+每个翻译服务明确声明单次请求长度限制。输入超过限制时，依次尝试按段落、句子、空白位置和硬字符边界切分。`{v12}` 这类公式占位符必须作为整体保留。所有分段按原顺序翻译并合并。
 
-The Bing provider must never silently execute `text[:1000]`; the Google provider must never silently execute `text[:5000]`. Limits may still be respected, but only through explicit chunking.
+Bing 不得再通过 `text[:1000]` 静默丢弃后文，Google 也不得通过 `text[:5000]` 静默丢弃后文。仍然遵守服务长度限制，但必须通过显式分段完成。
 
-### Result validation
+### 结果校验
 
-Before caching or rendering, the shared translator validates that:
+译文进入缓存或 PDF 排版之前，统一检查：
 
-- the result is a non-empty string for non-empty translatable input;
-- every formula placeholder in the source occurs in the result;
-- no chunk is missing from the assembled response;
-- provider errors and empty model responses are represented as failures, not successful empty translations.
+- 非空原文必须得到非空字符串；
+- 原文中的所有公式占位符必须保留在译文中；
+- 分段结果数量必须完整，不能缺少任何一段；
+- 服务报错和模型空返回必须作为失败处理，不能当作成功的空译文。
 
-Failed validation triggers bounded retries. If retries are exhausted, the original source is retained in the PDF and the failure is recorded. Invalid or partial results are never cached. Existing corrupt cache entries are rejected when they fail the same validation during lookup.
+校验失败时进行有限次数重试。重试仍失败时，在 PDF 中保留原文并记录失败信息。无效或残缺结果不得写入缓存；读取缓存时如果发现旧记录不完整，也必须拒绝使用。
 
-### Integrity report
+### 完整性报告
 
-Translation completion returns an integrity summary containing total segments, translated segments, retried segments, failed segments, and affected pages. The completion UI shows a concise success or warning message and allows the user to copy diagnostic details. The existing output files remain available even when some segments fail.
+翻译完成后返回完整性摘要，包括总段落数、成功数、重试数、失败数和受影响页码。完成界面显示简短的成功或警告信息，并支持复制诊断详情。即使少量段落失败，已经生成的输出文件仍然保留。
 
-## Windows UI Verification
+## Windows 界面验证
 
-Create a test-only control inventory that walks the widget tree after the main window is constructed. Controls receive stable object names where needed. Tests verify visibility/reachability, enabled-state transitions, signal connections, page navigation, cancellation, and safe behavior when no file or configuration is selected.
+测试代码在主窗口创建后遍历控件树，生成控件清单。需要稳定识别的控件补充固定对象名。自动测试检查控件是否可见或可访问、启用状态变化、信号连接、页面切换、取消操作，以及没有选择文件或配置时是否安全处理。
 
-The verification matrix covers:
+验证范围包括：
 
-- translation file management, page ranges, service selection, output modes, start, cancel, retry, and random greeting;
-- PDF preview modes, open, paging, zoom, fit modes, continuous view, rotation menu, highlights, erase, full screen, history, and AI question panel;
-- history grouping, selection, thumbnails, reveal/open-source operations, deletion, and clearing;
-- settings for translation services, connection testing, prompts, glossaries, themes, cache, layout, fonts, data directory, and Zotero installation/options;
-- summary, AI chat, prompt presets, update actions, external links, copy actions, and application close behavior.
+- 翻译页：文件管理、页码范围、服务选择、输出格式、开始、取消、失败重试和随机问候；
+- PDF 预览：模式切换、打开文件、翻页、缩放、适宽、适页、连续阅读、旋转菜单、高亮、擦除、全屏、历史记录和 AI 问答；
+- 历史记录：分组、选择、缩略图、打开所在位置、打开源文件、删除和清空；
+- 设置页：翻译服务、连接测试、提示词、术语表、主题、缓存、版面检测、字体、数据目录和 Zotero 安装及选项；
+- 摘要、AI 对话、提示词预设、更新操作、外部链接、复制操作和关闭应用。
 
-Tests must not launch Explorer, a browser, Zotero, or network calls directly. Those boundaries are mocked and their requested arguments are asserted. Windows path handling is tested with spaces, Unicode, long filenames, missing files, and locked files.
+自动测试不得真的启动资源管理器、浏览器、Zotero 或真实网络请求，而是检查程序是否向这些边界传递了正确参数。Windows 路径测试覆盖空格、中文、长文件名、文件不存在和文件被占用等情况。
 
-## Test Architecture
+## 测试结构
 
-Add a `tests/` suite using `pytest`, `pytest-qt`, and the Qt offscreen platform for automated UI tests. Translation-provider tests use deterministic fake sessions and fake OpenAI-compatible responses. PDF regression tests use small checked-in fixtures plus the reported paper when it is available locally; the checked-in suite must not depend on that external desktop path.
+新增 `tests/` 测试目录，使用 `pytest`、`pytest-qt` 和 Qt 离屏模式运行界面测试。翻译服务使用确定性的模拟响应。PDF 回归测试使用仓库内的小型测试文件；用户提供的论文如果本机存在，可作为额外真实回归样本，但正式测试不能依赖桌面上的固定路径。
 
-The suite is divided into:
+测试分为：
 
-- fast unit tests for chunking, validation, caching, parsing, and Windows paths;
-- page-level UI tests for controls and signal wiring;
-- worker integration tests for success, cancellation, retry, and failure reporting;
-- PDF regression tests that compare extracted source coverage, placeholder preservation, page counts, and renderability;
-- a short manual Windows release checklist for native dialogs, Explorer, Zotero, DPI scaling, and packaged executable startup.
+- 分段、校验、缓存、输入解析和 Windows 路径的快速单元测试；
+- 各页面控件和信号绑定测试；
+- 翻译工作线程的成功、取消、重试和失败报告集成测试；
+- 检查原文覆盖率、占位符、页数和可渲染性的 PDF 回归测试；
+- 验证原生对话框、资源管理器、Zotero、DPI 缩放和打包程序启动的简短人工清单。
 
-## Error Handling
+## 错误处理
 
-User-facing failures identify the affected file and action without exposing credentials. Diagnostic logs include provider name, page, segment identifier, retry count, and validation reason, but never API keys or full authorization headers. Destructive actions such as clearing history retain their existing confirmation behavior.
+用户提示必须指出受影响的文件和操作，但不能暴露凭据。诊断日志记录翻译服务、页码、段落编号、重试次数和校验失败原因，不记录 API Key 或完整授权请求头。清空历史等破坏性操作继续保留确认步骤。
 
-## Acceptance Criteria
+## 验收标准
 
-- Bing and Google translate text beyond their per-request limits without losing the tail.
-- Empty, partial, or placeholder-damaging translations are retried and never cached as successes.
-- A failed segment remains visible as source text and appears in the integrity report.
-- Every reachable Windows UI control has an automated construction/wiring test and an entry in the verification matrix.
-- Core workflows pass against representative text PDFs, formula-heavy PDFs, table PDFs, and the reported long-reference PDF.
-- Mono, dual, and side-by-side outputs open successfully and preserve expected page structure.
-- The packaged Windows application completes the manual release checklist on Windows 10 or 11.
-- No unrelated user changes are overwritten.
+- Bing 和 Google 可以翻译超过单次限制的文本，不丢失末尾内容。
+- 空译文、残缺译文和破坏占位符的译文会被重试，且不会作为成功结果进入缓存。
+- 某段最终失败时，PDF 中保留原文，并在完整性报告中标记。
+- 每个可访问的 Windows UI 控件都有构建或信号验证测试，并列入验证矩阵。
+- 文字型、公式型、表格型 PDF 以及本次报告问题的长参考文献 PDF 通过核心回归。
+- 三种输出 PDF 均能打开，并保持预期页数和结构。
+- Windows 10 或 Windows 11 上的打包程序通过人工发布清单。
+- 不覆盖无关的用户修改。
 
-## Out of Scope
+## 不包含的工作
 
-- Redesigning the visual appearance of the application.
-- Supporting operating systems other than Windows.
-- Guaranteeing availability or correctness of third-party translation services.
-- Automating real credentials, real paid API calls, or installation into a user’s live Zotero profile during the test suite.
+- 不重新设计界面视觉风格。
+- 不支持 Windows 之外的操作系统。
+- 不保证第三方翻译服务始终可用或翻译内容绝对正确。
+- 自动测试不使用真实付费凭据，也不向用户正在使用的 Zotero 配置安装插件。
