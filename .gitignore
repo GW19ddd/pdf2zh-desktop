@@ -50,3 +50,6 @@ reference/
 
 # Local release build output
 .release/
+
+# Isolated Codex development worktrees
+.worktrees/
