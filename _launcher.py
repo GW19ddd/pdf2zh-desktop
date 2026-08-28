@@ -150,8 +150,9 @@ def main():
     os.environ["QT_PLUGIN_PATH"] = qt_plugin_path
     log(f"QT_PLUGIN_PATH: {qt_plugin_path}")
 
-    # DPI 感知：让 Qt 正确处理高分屏缩放
-    os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
+    # DPI 感知: v2.3.17 改为仅用下方 QApplication.setAttribute(AA_EnableHighDpiScaling)。
+    # 移除 QT_AUTO_SCREEN_SCALE_FACTOR —— 两者叠加在部分高分屏(125%/150%)上会产生双重缩放,
+    # 导致窗口尺寸错乱、鼠标命中测试错位(下半部分按钮点不动 / 点击后窗口变小)。
 
     # 关键：必须在 PyQt5 之前预加载 OnnxRuntime
     log("预加载 OnnxRuntime...")

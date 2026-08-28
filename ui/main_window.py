@@ -655,7 +655,7 @@ from PyQt5.QtWidgets import (
     QCheckBox, QListWidget, QListWidgetItem, QLineEdit, QSpinBox, QPlainTextEdit,
     QSizePolicy, QSlider, QSplitter, QTabBar, QMessageBox, QMenu, QAction,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QSize, QEvent, QRect
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QSize, QEvent, QRect, QThread
 from PyQt5.QtGui import (QColor, QDragEnterEvent, QDropEvent, QImage, QPixmap,
                          QScreen, QIcon, QPainter, QPainterPath, QPen, QRegion)
 
@@ -711,6 +711,28 @@ D = {
 }
 
 _C = L   # 当前活跃配色（深色/浅色切换时更新）
+
+
+# ─── Zotero 回写后台线程 ─────────────────────────────────────
+class _ZoteroWritebackWorker(QThread):
+    """v2.3.17: Zotero 回写后台线程 — 插件端 importFromFile 导入大 PDF 时 HTTP 等待
+    可能持续数秒甚至更久, 若在主线程同步执行会卡死事件循环(界面假死、按钮点不了)。
+    在后台线程跑完整回写逻辑, 完成后经 result 信号回主线程推进队列。"""
+    result = pyqtSignal(object, object)  # (file_path, output_files)
+
+    def __init__(self, window, file_path, output_files):
+        super().__init__()
+        self._win = window
+        self._fp = file_path
+        self._out = output_files
+
+    def run(self):
+        try:
+            self._win._zotero_writeback_impl(self._fp, self._out)
+        except Exception:
+            pass
+        finally:
+            self.result.emit(self._fp, self._out)
 
 
 # ─── 磨砂提示气泡 ──────────────────────────────────────────
@@ -4091,14 +4113,9 @@ class TranslatePage(QWidget):
                 else:
                     (QMessageBox.warning if ttr.get("error") else QMessageBox.information)(self, title, text)
 
-        # Zotero 回写：按此文件自身的来源路径，把译文复制回原位
+        # v2.3.17: Zotero 回写放后台线程(避免插件端 importFromFile 的 HTTP 等待卡死主线程),
+        # 队列推进改在 _on_writeback_done 信号槽里做, 保持"回写完成才推进下一个"的串行语义。
         self._zotero_writeback(fp, output_files)
-
-        self._batch_results.append((fp, output_files))
-
-        # 推进到下一个文件
-        self._batch_idx += 1
-        self._translate_next()
 
     def _on_single_err(self, msg):
         """单文件翻译出错 — 记录后继续下一个"""
@@ -4123,12 +4140,24 @@ class TranslatePage(QWidget):
             self._on_err(msg)
 
     def _zotero_writeback(self, file_path, output_files):
+        """v2.3.17: Zotero 回写放后台线程执行 — 插件端 importFromFile 导入大 PDF 时 HTTP 等待
+        可能持续数秒甚至更久, 在主线程同步执行会卡死事件循环(界面假死、按钮点不了)。
+        实际逻辑在 _zotero_writeback_impl(后台线程), 完成后经 _on_writeback_done 回主线程推进队列。"""
+        wb = _ZoteroWritebackWorker(self, file_path, output_files)
+        wb.result.connect(self._on_writeback_done)
+        wb.finished.connect(lambda: wb.deleteLater() if not wb.isRunning() else None)
+        self._wb_worker = wb  # 持有引用防 GC
+        wb.start()
+
+    def _zotero_writeback_impl(self, file_path, output_files):
         """把译文关联为 Zotero 子附件(直接从本地输出路径导入, 不再复制进原文献 storage 文件夹)
         v2.3.7: 之前先复制进原文献 storage 文件夹再关联, 关联成功后那份复制就成了没人引用的孤儿文件,
         一直堆在原文献文件夹里(issue反馈)。importFromFile 能直接从任意本地路径导入, 不需要先复制。
-        只在关联真正失败时才落一份到原文献文件夹做人工兜底。"""
+        只在关联真正失败时才落一份到原文献文件夹做人工兜底。
+        v2.3.17: 本方法运行在 _ZoteroWritebackWorker 后台线程, 禁止直接操作 Qt 控件
+        (提示消息改用 _dbg_write 记录, 不在后台线程碰 UI)。"""
         import shutil
-        _dbg_write(f"_zotero_writeback file_path={file_path!r} output_files={output_files}")
+        _dbg_write(f"_zotero_writeback_impl file_path={file_path!r} output_files={output_files}")
         zotero_dir = detect_zotero_source(file_path)
         _dbg_write(f"  detect_zotero_source → {zotero_dir!r}")
         # v1.0.20: 链接附件(zotmoov 等插件把 PDF 移到自定义目录)不在 Zotero storage 里,
@@ -4194,12 +4223,9 @@ class TranslatePage(QWidget):
                         linked = True
                         self._zotero_writeback_ok = True
                     else:
-                        try: self.prog_detail.setText(f"⚠️ {msg}")
-                        except Exception: pass
+                        _dbg_write(f"    ⚠️ 关联失败: {msg}")
                 except Exception as e:
                     _dbg_write(f"    ✗ zotero_auto_link EXCEPTION: {e}")
-                    try: self.prog_detail.setText(f"⚠️ Zotero 联动异常: {e}")
-                    except Exception: pass
             else:
                 _dbg_write(f"    ✗ item_key is None → no attach POST")
 
@@ -4214,15 +4240,37 @@ class TranslatePage(QWidget):
                 # 兜底: 关联失败(插件没响应/未装)时落一份到原文献文件夹方便手动找到; 绝不删 src
                 if zotero_dir:
                     dst = os.path.join(zotero_dir, os.path.basename(src))
-                    if os.path.abspath(src) != os.path.abspath(dst):
-                        try:
-                            shutil.copy2(src, dst)
+                    # v2.3.x: Windows 文件系统大小写不敏感, 统一转小写再比较,
+                    # 避免 Zotero 目录与临时输出目录盘符/大小写写法不同时被误判为"不同路径"重复复制
+                    if os.path.abspath(src).lower() != os.path.abspath(dst).lower():
+                        copied = False
+                        for _attempt in range(3):
+                            try:
+                                shutil.copy2(src, dst)
+                                copied = True
+                                break
+                            except PermissionError:
+                                # v2.3.x: Zotero 可能正占用文件(如仍在读取附件)导致 copy2 失败,
+                                # 等待 0.5s 后重试, 最多 3 次
+                                if _attempt < 2:
+                                    time.sleep(0.5)
+                                    continue
+                                _dbg_write(f"    ✗ fallback copy failed (file locked): {dst!r}")
+                                break
+                            except Exception as e:
+                                _dbg_write(f"    ✗ fallback copy failed: {e}")
+                                break
+                        if copied:
                             _dbg_write(f"    ⚠ fallback copied to {dst!r}(关联失败, 留本地兜底)")
-                        except Exception as e:
-                            _dbg_write(f"    ✗ fallback copy failed: {e}")
                 else:
                     # v1.0.20: 链接附件场景没有 storage 目录, 不做兜底复制
                     _dbg_write(f"    ⚠ no zotero_dir for linked attachment, skip fallback copy")
+
+    def _on_writeback_done(self, fp, output_files):
+        """v2.3.17: Zotero 回写线程完成(主线程槽) — 记录结果并推进队列"""
+        self._batch_results.append((fp, output_files))
+        self._batch_idx += 1
+        self._translate_next()
 
     def _on_batch_done(self):
         """全部文件翻译完成"""
@@ -6051,114 +6099,33 @@ class AboutPage(QWidget):
         ac = _card(); acl = QHBoxLayout(ac); acl.setContentsMargins(16,12,16,12); acl.setSpacing(10)
         author_av = QLabel()
         author_av.setFixedSize(36, 36)
-        avatar_path = _res('assets', 'author_avatar.png')
-        if os.path.exists(avatar_path):
-            apx = QPixmap(avatar_path).scaled(72, 72, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            apx.setDevicePixelRatio(2.0)
-            author_av.setPixmap(apx)
-        else:
-            author_av.setText("艾"); author_av.setAlignment(Qt.AlignCenter)
-            author_av.setStyleSheet("background:#1a1a2e;border-radius:18px;color:white;font-size:16px;font-weight:700;")
+        author_av.setText("P"); author_av.setAlignment(Qt.AlignCenter)
+        author_av.setStyleSheet("background:#0071E3;border-radius:18px;color:white;font-size:16px;font-weight:700;")
         acl.addWidget(author_av)
         ai = QVBoxLayout(); ai.setSpacing(0)
-        an = QLabel("艾伦说"); an.setStyleSheet("font-size:13px;font-weight:700;"); ai.addWidget(an)
-        xhs = QLabel("小红书: needsleeeeep"); xhs.setObjectName("Cap"); xhs.setStyleSheet("font-size:11px;"); ai.addWidget(xhs)
+        an = QLabel("PaperFlow 作者"); an.setStyleSheet("font-size:13px;font-weight:700;"); ai.addWidget(an)
+        xhs = QLabel("QQ: 2994574297@qq.com"); xhs.setObjectName("Cap"); xhs.setStyleSheet("font-size:11px;"); ai.addWidget(xhs)
         motto = QLabel("希望能做更有意义的事 · 专注交付生产级的垂直学术公共品 🍀")
         motto.setObjectName("Cap"); motto.setStyleSheet("font-size:10px;color:rgba(142,142,147,0.7);"); ai.addWidget(motto)
         acl.addLayout(ai); acl.addStretch()
-        xhs_btn = QPushButton("关注 ↗"); xhs_btn.setObjectName("Gh"); xhs_btn.setCursor(Qt.PointingHandCursor)
-        xhs_btn.setStyleSheet("font-size:11px;")
-        xhs_btn.clicked.connect(lambda: webbrowser.open("https://www.xiaohongshu.com/user/profile/66c6fef7000000001d0315ef"))
-        acl.addWidget(xhs_btn)
+        contact_btn = QPushButton("联系作者"); contact_btn.setObjectName("Gh"); contact_btn.setCursor(Qt.PointingHandCursor)
+        contact_btn.setStyleSheet("font-size:11px;")
+        contact_btn.clicked.connect(lambda: (QApplication.clipboard().setText("2994574297@qq.com"), webbrowser.open("mailto:2994574297@qq.com")))
+        acl.addWidget(contact_btn)
         right.addWidget(ac)
 
-        # 支持者头像墙
+        # 联系作者
         cc = _card(); ccl = QVBoxLayout(cc); ccl.setContentsMargins(16,12,16,12); ccl.setSpacing(6)
-        ct = QLabel("感谢小红书社区支持者 ♡"); ct.setStyleSheet("font-size:11px;font-weight:600;"); ccl.addWidget(ct)
-
-        supporters = [
-            "星爷！","卧","Jun warrior","幼儿园鹿小眸","侠禅",
-            "ol","幼儿园老大","MX","贝斯特宋","Catherine",
-            "不哩不哩左门卫","momo","李善兰","问道不求仙","hml",
-            "ThereisTherse","人类与猫","小红薯643C3625","月栖竹","风来",
-            "Nick","咕噜咕噜🍗","雾散时分起","大脸咪布爱吃鱼","限定 momo",
-            "麦兜","锅的刚","一颗冒泡的卤蛋","我草莓招了",
-            "去Nature整点论文","Masker",
-            "AI maker趣造","帕克的创业日记","思维汪汪","橘座","小白也想学编程",
-            "宛风Vanfeng","小宝の日常","未来百科","你们的万能小卓","碎银几两",
-            "创界AIzine","全栈小5","无敌霸王龙","小艾同学","一万块的快乐",
-            "学习笔记","三丰不是张","丁一","阿漫AIChat","知命不惧",
-            "脱离社畜体制","一瓢清浅","Crazyang","逛逛GitHub","AI视界AIGC",
-            "极客梦想家","沐沐子","Topaz","三不沾","EchoAI",
-            "阳台吹风","Cursor实战派","简单就好","进击的小学生","AI探索家",
-            "科技小飞侠","数字游民","AI能量站","工程师小灰","AI淘金",
-            "量子比特","NeonCode","尝试新事物的Cher","有趣的灵魂不需要名字",
-            "阿杰的编程日记","小明同学","码农翻身","AI大航海","月亮与六便士",
-            "渡己","数码宝贝","悟空AI","追风少年","Tech小确幸",
-            "半糖主义","深夜程序员","AI小天才","知行合一","星辰大海",
-            "比特流","指尖上的代码","未来可期","云端漫步","AI引路人",
-            "秋风扫落叶","编程小王子","日拱一卒","逆风翻盘","AI百宝箱",
-            "程序猿日记","数据炼金术","量子纠缠","无限可能","风轻云淡",
-            "代码人生","AI学徒","机器之心","清风明月","代码诗人",
-            "零一万物","浮生若梦","技术宅","AI造物主","星河万里",
-            "小蜗牛","编程少女","数据猎人","逻辑大师","AI前沿",
-            "梦想家","代码如诗","量子跃迁","技术探路者","AI新青年",
-            "Tomo","小红薯63BEBA60","Answer",
-            "C01dSH","小红薯60E9F048","Hittagi","雪儿","デブ",
-            "根本赢不了","七一","Somnia Flora",
-        ]
-
-        grid = QGridLayout(); grid.setSpacing(3); grid.setContentsMargins(0,0,0,0)
-        cols_n = 12
-        for i, name in enumerate(supporters):
-            avatar = QLabel(name[0])
-            avatar.setFixedSize(26, 26); avatar.setAlignment(Qt.AlignCenter)
-            h = (hash(name) * 137) % 360
-            s = 50 + (hash(name) >> 8) % 20; l2 = 55 + (hash(name) >> 16) % 15
-            avatar.setStyleSheet(f"background:hsl({h},{s}%,{l2}%);border-radius:13px;font-size:9px;font-weight:600;color:white;")
-            avatar.setToolTip(name)
-            grid.addWidget(avatar, i // cols_n, i % cols_n, Qt.AlignCenter)
-        ccl.addLayout(grid)
-        sub = QLabel("无限迭代，只为更好的服务您")
-        sub.setObjectName("Cap"); sub.setAlignment(Qt.AlignCenter); sub.setStyleSheet("font-size:11px;"); ccl.addWidget(sub)
-        qq_group_btn = QPushButton("进入 pdf2zh 桌面版交流群"); qq_group_btn.setObjectName("Gh"); qq_group_btn.setCursor(Qt.PointingHandCursor)
-        qq_group_btn.setStyleSheet("font-size:11px;")
-        def _show_qq_qr():
-            QApplication.clipboard().setText("1094195179")
-            c = _C
-            qr_dlg = QDialog(self)
-            qr_dlg.setWindowTitle("加入交流群")
-            qr_dlg.setStyleSheet(f"QDialog{{background:{c['bg']};}}")
-            qlo = QVBoxLayout(qr_dlg); qlo.setContentsMargins(0, 0, 0, 12); qlo.setSpacing(8)
-            qr_label = QLabel()
-            qr_label.setAlignment(Qt.AlignCenter)
-            qr_path = None
-            for candidate in [
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'qq_group_qr.png'),
-                os.path.join(getattr(sys, '_MEIPASS', ''), 'assets', 'qq_group_qr.png'),
-            ]:
-                if os.path.exists(candidate):
-                    qr_path = candidate
-                    break
-            if qr_path:
-                pix = QPixmap(qr_path)
-                # setScaledContents 让图片自动填满 label，不裁切
-                qr_label.setPixmap(pix)
-                qr_label.setScaledContents(True)
-                qr_label.setFixedSize(300, int(300 * pix.height() / pix.width()))
-                qr_dlg.setFixedSize(300, int(300 * pix.height() / pix.width()) + 40)
-            else:
-                qr_label.setText("请用 QQ 搜索群号 1094195179")
-                qr_label.setStyleSheet(f"font-size:13px;color:{c['t2']};padding:30px;")
-                qr_dlg.setFixedSize(300, 100)
-            qlo.addWidget(qr_label)
-            tip = QLabel("群号 1094195179 已复制到剪贴板")
-            tip.setAlignment(Qt.AlignCenter)
-            tip.setStyleSheet(f"font-size:11px;color:{c['acc']};")
-            qlo.addWidget(tip)
-            qr_dlg.exec_()
-        qq_group_btn.clicked.connect(_show_qq_qr)
-        ccl.addWidget(qq_group_btn, 0, Qt.AlignCenter)
+        ct = QLabel("联系作者 ♡"); ct.setStyleSheet("font-size:11px;font-weight:600;"); ccl.addWidget(ct)
+        contact_info = QLabel("QQ: 2994574297@qq.com\nGitHub: github.com/AaronGIG/pdf2zh-desktop")
+        contact_info.setObjectName("Cap"); contact_info.setAlignment(Qt.AlignCenter)
+        contact_info.setStyleSheet("font-size:11px;line-height:1.6;")
+        contact_info.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        ccl.addWidget(contact_info)
+        qq_copy_btn = QPushButton("复制作者 QQ"); qq_copy_btn.setObjectName("Gh"); qq_copy_btn.setCursor(Qt.PointingHandCursor)
+        qq_copy_btn.setStyleSheet("font-size:11px;")
+        qq_copy_btn.clicked.connect(lambda: QApplication.clipboard().setText("2994574297@qq.com"))
+        ccl.addWidget(qq_copy_btn, 0, Qt.AlignCenter)
         right.addWidget(cc)
         right.addStretch()
 
@@ -6431,7 +6398,6 @@ class MainWindow(QMainWindow):
         link_row.setContentsMargins(8,0,8,4); link_row.addStretch()
         for text, url in [
             ("GitHub", "https://github.com/AaronGIG/pdf2zh-desktop"),
-            ("小红书", "https://www.xiaohongshu.com/user/profile/66c6fef7000000001d0315ef"),
             ("Feedback", "https://github.com/AaronGIG/pdf2zh-desktop/issues"),
             ("Star ⭐", "https://github.com/AaronGIG/pdf2zh-desktop"),
         ]:
@@ -6492,32 +6458,6 @@ class MainWindow(QMainWindow):
         now = datetime.now()
         if now.hour == 3 and 25 <= now.minute <= 35:
             QTimer.singleShot(800, self._midnight_bloom)
-
-        # ── v2.3.7: 启动后检查更新(只检测+提示, 不下载不替换任何文件) ──
-        QTimer.singleShot(3_000, self._check_for_update)
-
-    def _check_for_update(self):
-        self._update_worker = UpdateCheckWorker()
-        self._update_worker.found.connect(self._on_update_found)
-        self._update_worker.start()
-
-    def _on_update_found(self, version, url):
-        try:
-            cur = tuple(int(x) for x in APP_VERSION.split("."))
-            new = tuple(int(x) for x in version.split("."))
-        except Exception:
-            return
-        if new <= cur:
-            return
-        try:
-            cfg = UserConfigManager.load() or {}
-            if cfg.get("dismissed_update_version") == version:
-                return
-        except Exception:
-            pass
-        ap = self.pages.get("关于")
-        if ap:
-            ap.show_update_notice(version, url)
 
     # ─────────────────────────────────────────────
     #  凌晨 3:30 彩蛋 — 烟花 + 暖心寄语

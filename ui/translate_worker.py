@@ -4,6 +4,7 @@ import os
 import re
 import time
 import asyncio
+import pathlib
 import fitz  # PyMuPDF
 
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -339,7 +340,9 @@ def resolve_zotero_items(item_ids):
     storage_dir = os.path.join(data_dir, "storage")
     pdfs = []
     try:
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        # v2.3.x: Windows 路径含盘符冒号与反斜杠, 直接拼进 file: URI 在含 `?`/`#` 等
+        # 特殊字符时会被截断/误解析; 用 pathlib.Path.as_uri() 得到规范 `file:///C:/...` 形式
+        conn = sqlite3.connect(pathlib.Path(db_path).as_uri() + "?mode=ro&immutable=1", uri=True)
         cur = conn.cursor()
         placeholders = ",".join("?" * len(item_ids))
         # 1) item_ids 本身是 PDF 附件的情况
@@ -394,7 +397,9 @@ def resolve_zotero_collection(collection_id_or_key):
     storage_dir = os.path.join(data_dir, "storage")
     pdfs = []
     try:
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        # v2.3.x: Windows 路径含盘符冒号与反斜杠, 直接拼进 file: URI 在含 `?`/`#` 等
+        # 特殊字符时会被截断/误解析; 用 pathlib.Path.as_uri() 得到规范 `file:///C:/...` 形式
+        conn = sqlite3.connect(pathlib.Path(db_path).as_uri() + "?mode=ro&immutable=1", uri=True)
         cur = conn.cursor()
         # 支持 numeric ID 或 string key
         raw = str(collection_id_or_key).strip()
@@ -517,7 +522,9 @@ def resolve_zotero_key_for_path(abs_path):
         return None
     db_path = os.path.join(data_dir, "zotero.sqlite")
     try:
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        # v2.3.x: Windows 路径含盘符冒号与反斜杠, 直接拼进 file: URI 在含 `?`/`#` 等
+        # 特殊字符时会被截断/误解析; 用 pathlib.Path.as_uri() 得到规范 `file:///C:/...` 形式
+        conn = sqlite3.connect(pathlib.Path(db_path).as_uri() + "?mode=ro&immutable=1", uri=True)
         cur = conn.cursor()
         keys = set()
         # 1) 绝对路径直接匹配(链接附件在 ia.path 里存绝对路径; Windows 大小写不敏感)
@@ -593,7 +600,9 @@ def resolve_zotero_by_title(text):
     storage_dir = os.path.join(data_dir, "storage")
     pdfs = []
     try:
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        # v2.3.x: Windows 路径含盘符冒号与反斜杠, 直接拼进 file: URI 在含 `?`/`#` 等
+        # 特殊字符时会被截断/误解析; 用 pathlib.Path.as_uri() 得到规范 `file:///C:/...` 形式
+        conn = sqlite3.connect(pathlib.Path(db_path).as_uri() + "?mode=ro&immutable=1", uri=True)
         cur = conn.cursor()
         # 每个父条目只取最早的 PDF 附件（原始论文）
         cur.execute(
@@ -648,7 +657,9 @@ def resolve_zotero_collection_by_name(name):
     storage_dir = os.path.join(data_dir, "storage")
     pdfs = []
     try:
-        conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        # v2.3.x: Windows 路径含盘符冒号与反斜杠, 直接拼进 file: URI 在含 `?`/`#` 等
+        # 特殊字符时会被截断/误解析; 用 pathlib.Path.as_uri() 得到规范 `file:///C:/...` 形式
+        conn = sqlite3.connect(pathlib.Path(db_path).as_uri() + "?mode=ro&immutable=1", uri=True)
         cur = conn.cursor()
         cur.execute(
             "SELECT collectionID FROM collections WHERE collectionName = ?",
