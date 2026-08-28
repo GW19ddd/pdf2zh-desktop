@@ -1,6 +1,6 @@
 # pdf2zh Connector（Zotero 插件）
 
-配合 [pdf2zh-desktop](https://github.com/GW19ddd/pdf2zh-desktop) 使用的 Zotero 右键翻译插件。
+配合 [pdf2zh-desktop](https://github.com/AaronGIG/pdf2zh-desktop) 使用的 Zotero 右键翻译插件。
 
 - 在 Zotero 条目树或 PDF 阅读器内对 PDF 右键 → 「📖 用 PaperFlow 翻译」
 - 翻译完成后译文自动挂回原条目：普通附件导入 storage；**链接附件**（zotmoov 等移走的 PDF）放回原 PDF 同目录并链接关联

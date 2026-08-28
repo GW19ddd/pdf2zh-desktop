@@ -4997,111 +4997,33 @@ class AboutPage(QWidget):
         ac = _card(); acl = QHBoxLayout(ac); acl.setContentsMargins(16,12,16,12); acl.setSpacing(10)
         author_av = QLabel()
         author_av.setFixedSize(36, 36)
-        avatar_path = _res('assets', 'author_avatar.png')
-        if os.path.exists(avatar_path):
-            apx = QPixmap(avatar_path).scaled(72, 72, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            apx.setDevicePixelRatio(2.0)
-            author_av.setPixmap(apx)
-        else:
-            author_av.setText("艾"); author_av.setAlignment(Qt.AlignCenter)
-            author_av.setStyleSheet("background:#1a1a2e;border-radius:18px;color:white;font-size:16px;font-weight:700;")
+        author_av.setText("P"); author_av.setAlignment(Qt.AlignCenter)
+        author_av.setStyleSheet("background:#0071E3;border-radius:18px;color:white;font-size:16px;font-weight:700;")
         acl.addWidget(author_av)
         ai = QVBoxLayout(); ai.setSpacing(0)
-        an = QLabel("艾伦说"); an.setStyleSheet("font-size:13px;font-weight:700;"); ai.addWidget(an)
-        xhs = QLabel("小红书: needsleeeeep"); xhs.setObjectName("Cap"); xhs.setStyleSheet("font-size:11px;"); ai.addWidget(xhs)
+        an = QLabel("PaperFlow 作者"); an.setStyleSheet("font-size:13px;font-weight:700;"); ai.addWidget(an)
+        xhs = QLabel("QQ: 2994574297@qq.com"); xhs.setObjectName("Cap"); xhs.setStyleSheet("font-size:11px;"); ai.addWidget(xhs)
         motto = QLabel("希望能做更有意义的事 · 专注交付生产级的垂直学术公共品 🍀")
         motto.setObjectName("Cap"); motto.setStyleSheet("font-size:10px;color:rgba(142,142,147,0.7);"); ai.addWidget(motto)
         acl.addLayout(ai); acl.addStretch()
-        xhs_btn = QPushButton("关注 ↗"); xhs_btn.setObjectName("Gh"); xhs_btn.setCursor(Qt.PointingHandCursor)
-        xhs_btn.setStyleSheet("font-size:11px;")
-        xhs_btn.clicked.connect(lambda: webbrowser.open("https://www.xiaohongshu.com/user/profile/66c6fef7000000001d0315ef"))
-        acl.addWidget(xhs_btn)
+        contact_btn = QPushButton("联系作者"); contact_btn.setObjectName("Gh"); contact_btn.setCursor(Qt.PointingHandCursor)
+        contact_btn.setStyleSheet("font-size:11px;")
+        contact_btn.clicked.connect(lambda: (QApplication.clipboard().setText("2994574297@qq.com"), webbrowser.open("mailto:2994574297@qq.com")))
+        acl.addWidget(contact_btn)
         right.addWidget(ac)
 
-        # 支持者头像墙
+        # 联系作者
         cc = _card(); ccl = QVBoxLayout(cc); ccl.setContentsMargins(16,12,16,12); ccl.setSpacing(6)
-        ct = QLabel("感谢小红书社区支持者 ♡"); ct.setStyleSheet("font-size:11px;font-weight:600;"); ccl.addWidget(ct)
-
-        supporters = [
-            "星爷！","卧","Jun warrior","幼儿园鹿小眸","侠禅",
-            "ol","幼儿园老大","MX","贝斯特宋","Catherine",
-            "不哩不哩左门卫","momo","李善兰","问道不求仙","hml",
-            "ThereisTherse","人类与猫","小红薯643C3625","月栖竹","风来",
-            "Nick","咕噜咕噜🍗","雾散时分起","大脸咪布爱吃鱼","限定 momo",
-            "麦兜","锅的刚","一颗冒泡的卤蛋","我草莓招了",
-            "去Nature整点论文","Masker",
-            "AI maker趣造","帕克的创业日记","思维汪汪","橘座","小白也想学编程",
-            "宛风Vanfeng","小宝の日常","未来百科","你们的万能小卓","碎银几两",
-            "创界AIzine","全栈小5","无敌霸王龙","小艾同学","一万块的快乐",
-            "学习笔记","三丰不是张","丁一","阿漫AIChat","知命不惧",
-            "脱离社畜体制","一瓢清浅","Crazyang","逛逛GitHub","AI视界AIGC",
-            "极客梦想家","沐沐子","Topaz","三不沾","EchoAI",
-            "阳台吹风","Cursor实战派","简单就好","进击的小学生","AI探索家",
-            "科技小飞侠","数字游民","AI能量站","工程师小灰","AI淘金",
-            "量子比特","NeonCode","尝试新事物的Cher","有趣的灵魂不需要名字",
-            "阿杰的编程日记","小明同学","码农翻身","AI大航海","月亮与六便士",
-            "渡己","数码宝贝","悟空AI","追风少年","Tech小确幸",
-            "半糖主义","深夜程序员","AI小天才","知行合一","星辰大海",
-            "比特流","指尖上的代码","未来可期","云端漫步","AI引路人",
-            "秋风扫落叶","编程小王子","日拱一卒","逆风翻盘","AI百宝箱",
-            "程序猿日记","数据炼金术","量子纠缠","无限可能","风轻云淡",
-            "代码人生","AI学徒","机器之心","清风明月","代码诗人",
-            "零一万物","浮生若梦","技术宅","AI造物主","星河万里",
-            "小蜗牛","编程少女","数据猎人","逻辑大师","AI前沿",
-            "梦想家","代码如诗","量子跃迁","技术探路者","AI新青年",
-        ]
-
-        grid = QGridLayout(); grid.setSpacing(3); grid.setContentsMargins(0,0,0,0)
-        cols_n = 12
-        for i, name in enumerate(supporters):
-            avatar = QLabel(name[0])
-            avatar.setFixedSize(26, 26); avatar.setAlignment(Qt.AlignCenter)
-            h = (hash(name) * 137) % 360
-            s = 50 + (hash(name) >> 8) % 20; l2 = 55 + (hash(name) >> 16) % 15
-            avatar.setStyleSheet(f"background:hsl({h},{s}%,{l2}%);border-radius:13px;font-size:9px;font-weight:600;color:white;")
-            avatar.setToolTip(name)
-            grid.addWidget(avatar, i // cols_n, i % cols_n, Qt.AlignCenter)
-        ccl.addLayout(grid)
-        sub = QLabel("无限迭代，只为更好的服务您")
-        sub.setObjectName("Cap"); sub.setAlignment(Qt.AlignCenter); sub.setStyleSheet("font-size:11px;"); ccl.addWidget(sub)
-        qq_group_btn = QPushButton("进入 pdf2zh 桌面版交流群"); qq_group_btn.setObjectName("Gh"); qq_group_btn.setCursor(Qt.PointingHandCursor)
-        qq_group_btn.setStyleSheet("font-size:11px;")
-        def _show_qq_qr():
-            QApplication.clipboard().setText("1094195179")
-            c = _C
-            qr_dlg = QDialog(self)
-            qr_dlg.setWindowTitle("加入交流群")
-            qr_dlg.setStyleSheet(f"QDialog{{background:{c['bg']};}}")
-            qlo = QVBoxLayout(qr_dlg); qlo.setContentsMargins(0, 0, 0, 12); qlo.setSpacing(8)
-            qr_label = QLabel()
-            qr_label.setAlignment(Qt.AlignCenter)
-            qr_path = None
-            for candidate in [
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'qq_group_qr.png'),
-                os.path.join(getattr(sys, '_MEIPASS', ''), 'assets', 'qq_group_qr.png'),
-            ]:
-                if os.path.exists(candidate):
-                    qr_path = candidate
-                    break
-            if qr_path:
-                pix = QPixmap(qr_path)
-                # setScaledContents 让图片自动填满 label，不裁切
-                qr_label.setPixmap(pix)
-                qr_label.setScaledContents(True)
-                qr_label.setFixedSize(300, int(300 * pix.height() / pix.width()))
-                qr_dlg.setFixedSize(300, int(300 * pix.height() / pix.width()) + 40)
-            else:
-                qr_label.setText("请用 QQ 搜索群号 1094195179")
-                qr_label.setStyleSheet(f"font-size:13px;color:{c['t2']};padding:30px;")
-                qr_dlg.setFixedSize(300, 100)
-            qlo.addWidget(qr_label)
-            tip = QLabel("群号 1094195179 已复制到剪贴板")
-            tip.setAlignment(Qt.AlignCenter)
-            tip.setStyleSheet(f"font-size:11px;color:{c['acc']};")
-            qlo.addWidget(tip)
-            qr_dlg.exec_()
-        qq_group_btn.clicked.connect(_show_qq_qr)
-        ccl.addWidget(qq_group_btn, 0, Qt.AlignCenter)
+        ct = QLabel("联系作者 ♡"); ct.setStyleSheet("font-size:11px;font-weight:600;"); ccl.addWidget(ct)
+        contact_info = QLabel("QQ: 2994574297@qq.com\nGitHub: github.com/AaronGIG/pdf2zh-desktop")
+        contact_info.setObjectName("Cap"); contact_info.setAlignment(Qt.AlignCenter)
+        contact_info.setStyleSheet("font-size:11px;line-height:1.6;")
+        contact_info.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        ccl.addWidget(contact_info)
+        qq_copy_btn = QPushButton("复制作者 QQ"); qq_copy_btn.setObjectName("Gh"); qq_copy_btn.setCursor(Qt.PointingHandCursor)
+        qq_copy_btn.setStyleSheet("font-size:11px;")
+        qq_copy_btn.clicked.connect(lambda: QApplication.clipboard().setText("2994574297@qq.com"))
+        ccl.addWidget(qq_copy_btn, 0, Qt.AlignCenter)
         right.addWidget(cc)
         right.addStretch()
 
@@ -5347,7 +5269,6 @@ class MainWindow(QMainWindow):
         link_row.setContentsMargins(8,0,8,4); link_row.addStretch()
         for text, url in [
             ("GitHub", "https://github.com/AaronGIG/pdf2zh-desktop"),
-            ("小红书", "https://www.xiaohongshu.com/user/profile/66c6fef7000000001d0315ef"),
             ("Feedback", "https://github.com/AaronGIG/pdf2zh-desktop/issues"),
             ("Star ⭐", "https://github.com/AaronGIG/pdf2zh-desktop"),
         ]:

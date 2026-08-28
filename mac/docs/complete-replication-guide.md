@@ -109,8 +109,8 @@ mac/
 │
 ├── assets/
 │   ├── app_icon.png             # 应用图标
-│   ├── author_avatar.png        # 作者头像
-│   ├── qq_group_qr.png          # QQ群二维码
+│   ├── app_icon.png             # 应用图标
+│   └── pf-radio.png             # 界面素材
 │   ├── doclayout_yolo.onnx      # 布局检测模型 (72MB)
 │   ├── pdf2zh-connector.xpi     # Zotero 插件
 │   ├── zotero-plugin/           # 插件源码

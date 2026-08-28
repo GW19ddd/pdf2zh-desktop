@@ -188,7 +188,7 @@ function promptPickExecutable(): Promise<string | null> {
             "点“确定”手动选择 " +
             (Zotero.isWin ? "pdf2zh.exe" : "pdf2zh.app") +
             " 的位置(只需选一次)；\n" +
-            "点“取消”去下载：github.com/GW19ddd/pdf2zh-desktop/releases"
+            "点“取消”去下载：github.com/AaronGIG/pdf2zh-desktop/releases"
         );
         if (yes) {
           // Zotero 7/9 已移除扩展里的 Components，改用 Zotero.FilePicker
@@ -218,7 +218,7 @@ function promptPickExecutable(): Promise<string | null> {
           "未找到 PaperFlow 应用。\n" +
             "Windows: 把下载的 zip 解压, 确认有应用文件夹（内含 pdf2zh.exe）；建议解压到“下载”或“桌面”。\n" +
             "Mac: 把应用放进“应用程序”。\n\n" +
-            "下载：https://github.com/GW19ddd/pdf2zh-desktop/releases"
+            "下载：https://github.com/AaronGIG/pdf2zh-desktop/releases"
         );
       }
       resolve(picked);

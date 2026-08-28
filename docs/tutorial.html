@@ -21,7 +21,7 @@
   .wrap{max-width:1280px;margin:0 auto;padding:60px 32px 120px}
   nav.top{position:sticky;top:0;background:rgba(250,250,250,0.85);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line);z-index:100}
   nav.top .inner{max-width:1280px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:24px;font-size:14px}
-  /* MetaEidos logo — 原封不动来自 metaeidos.com .logo */
+  /* 品牌 Logo */
   nav.top .me-logo{font-family:'DM Sans','Noto Sans SC',-apple-system,sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.5px;color:#222;text-decoration:none;padding-right:14px;border-right:1px solid var(--line);margin-right:4px}
   nav.top .me-logo:hover{text-decoration:none;color:#d97338}
   nav.top .brand{font-weight:600;font-size:15px}
@@ -100,7 +100,7 @@
 
 <nav class="top">
   <div class="inner">
-    <a href="https://www.metaeidos.com/" target="_blank" rel="noopener" class="me-logo" title="MetaEidos · 北京知元智行科技有限公司">MetaEidos</a>
+    <span class="me-logo">PaperFlow</span>
     <span class="brand">pdf2zh-desktop<span class="ver">macOS · v2.3.9</span></span>
     <a href="#install" class="tab">安装</a>
     <a href="#sec-translate" class="tab">翻译</a>
@@ -111,7 +111,7 @@
     <a href="#ocr" class="tab">扫描件</a>
     <a href="#faq" class="tab">FAQ</a>
     <span class="spacer"></span>
-    <a href="https://github.com/GW19ddd/pdf2zh-desktop">GitHub ↗</a>
+    <a href="https://github.com/AaronGIG/pdf2zh-desktop">GitHub ↗</a>
   </div>
 </nav>
 
@@ -321,7 +321,7 @@
       <span class="num">PAGE 04</span>
       <h2>④ 关于页 — 反馈 & 支持</h2>
     </div>
-    <p class="lead">查看版本号、特性列表、跳转到 GitHub、加 QQ 群、看小红书支持者墙。出 bug 也从这里走。</p>
+    <p class="lead">查看版本号、特性列表、跳转到 GitHub、联系作者。出 bug 也从这里走。</p>
 
     <div class="stage" id="stage-about">
       <img src="screenshots/tab-04-about.png" alt="关于页截图">
@@ -336,10 +336,10 @@
     <div class="steps">
       <div class="step"><div class="badge">1</div><div class="body"><h4>版本与简介</h4><p>左上角是当前版本号（v2.3.9）。下面是简短描述：「开箱即用的学术 PDF 翻译工具」。</p></div></div>
       <div class="step"><div class="badge">2</div><div class="body"><h4>macOS 版特性</h4><p>列出本版本的核心能力：原生设计、深色模式、Dual/Mono/Side by Side、历史管理、智能分块、触摸板手势、术语表、AI 问答、Zotero 联动等。</p></div></div>
-      <div class="step"><div class="badge">3</div><div class="body"><h4>小红书账号</h4><p>「艾伦说」是项目作者的小红书号。发布更新预告、使用技巧、用户案例。点「关注」直接跳到主页。</p></div></div>
-      <div class="step"><div class="badge">4</div><div class="body"><h4>GitHub ↗</h4><p>跳转到 <a href="https://github.com/GW19ddd/pdf2zh-desktop">仓库主页</a>。看 Release 页下载新版、看 Issue 报 bug、看 Star 涨了多少。</p></div></div>
-      <div class="step"><div class="badge">5</div><div class="body"><h4>支持者墙</h4><p>感谢所有在小红书互动 / Star / 反馈 bug 的朋友。每个圆圈代表一位用户（昵称首字母）。</p></div></div>
-      <div class="step"><div class="badge">6</div><div class="body"><h4>进入 QQ 群</h4><p>桌面交流群。<strong>这是最快得到帮助的地方</strong> — 翻译异常、API 问题、功能建议丢群里，群主和老用户会回答。</p></div></div>
+      <div class="step"><div class="badge">3</div><div class="body"><h4>联系作者</h4><p>作者 QQ：<b>2994574297@qq.com</b>。使用问题、功能建议、合作交流都可以直接联系。</p></div></div>
+      <div class="step"><div class="badge">4</div><div class="body"><h4>GitHub ↗</h4><p>跳转到 <a href="https://github.com/AaronGIG/pdf2zh-desktop">仓库主页</a>。看 Release 页下载新版、看 Issue 报 bug、看 Star 涨了多少。</p></div></div>
+      <div class="step"><div class="badge">5</div><div class="body"><h4>Star 与反馈</h4><p>感谢所有 Star / 反馈 bug 的朋友。每个支持都是继续迭代的动力。</p></div></div>
+      <div class="step"><div class="badge">6</div><div class="body"><h4>联系作者</h4><p>有问题欢迎发邮件到 <b>2994574297@qq.com</b> — 翻译异常、API 问题、功能建议都可以直接联系。</p></div></div>
     </div>
   </section>
 
@@ -750,14 +750,14 @@
         <b>关键：不要看物理磁盘路径</b>，看 Zotero 里那篇原论文 → <b>展开</b> → 有没有出现「<code>Translated PDF - xxx</code>」子附件。<br>
         <b>没有子附件 = 联动失败</b>，v2.2.5+ / v2.2.6+ 会在状态栏给出明确原因：<br>
         - ❌ <b>Zotero 未打开</b> → 请打开 Zotero 后重新翻译<br>
-        - ❌ <b>插件未装/未启用</b> → 下载最新 <a href="https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.9/pdf2zh-connector-v1.0.19.xpi"><code>pdf2zh-connector-v1.0.19.xpi</code></a>，Zotero 里「工具 → 附加组件 → ⚙ → Install Add-on From File」装上后重启 Zotero<br>
+        - ❌ <b>插件未装/未启用</b> → 下载最新 <a href="https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.9/pdf2zh-connector-v1.0.19.xpi"><code>pdf2zh-connector-v1.0.19.xpi</code></a>，Zotero 里「工具 → 附加组件 → ⚙ → Install Add-on From File」装上后重启 Zotero<br>
         - ❌ <b>PDF 不在 Zotero storage 里</b> → 必须从 Zotero「右键 PDF → 显示文件」拖入 pdf2zh，从 Downloads/桌面拖不会触发同步<br>
         <br>翻译输出的 PDF 存在 <code>~/Documents/pdf2zh_files/</code> 是<b>默认行为</b>，正确联动时 Zotero 会自己把它拷进 storage 新目录 —— 不需要你手动调路径。</p>
       </div>
 
       <div class="card">
         <div class="top"><h5>Zotero 9.0.4+ 提示插件不兼容？</h5></div>
-        <p class="desc">这是旧 v1.0.5 插件的通配符 bug。下载最新 <a href="https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.9/pdf2zh-connector-v1.0.19.xpi"><code>pdf2zh-connector-v1.0.19.xpi</code></a>（1.6 KB）拖进 Zotero「附加组件」重装，兼容整个 Zotero 9.x 系列。<br>Mac/Win 用户<b>用同一份 xpi</b>（Zotero 插件是纯 JavaScript，跨平台）。</p>
+        <p class="desc">这是旧 v1.0.5 插件的通配符 bug。下载最新 <a href="https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.9/pdf2zh-connector-v1.0.19.xpi"><code>pdf2zh-connector-v1.0.19.xpi</code></a>（1.6 KB）拖进 Zotero「附加组件」重装，兼容整个 Zotero 9.x 系列。<br>Mac/Win 用户<b>用同一份 xpi</b>（Zotero 插件是纯 JavaScript，跨平台）。</p>
       </div>
 
       <div class="card">
@@ -773,8 +773,8 @@
 
   <footer>
     <p>pdf2zh-desktop · macOS Edition · v2.3.9</p>
-    <p>基于 PDFMathTranslate / MuPDF / PyQt5 ·  <a href="https://github.com/GW19ddd/pdf2zh-desktop">GitHub</a> · QQ 群从「关于」页加</p>
-    <p style="margin-top:14px;font-size:13px;color:#666">出品方 · <a href="https://www.metaeidos.com/" target="_blank" rel="noopener" style="font-family:'DM Sans','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:-0.3px;color:#222">MetaEidos</a> 北京知元智行科技有限公司</p>
+    <p>基于 PDFMathTranslate / MuPDF / PyQt5 ·  <a href="https://github.com/AaronGIG/pdf2zh-desktop">GitHub</a> · 联系作者 QQ: 2994574297@qq.com</p>
+    
     <p style="margin-top:6px;font-size:11px;color:#aaa">本教程截图来自实际运行的 v2.3.4 · macOS 14 · 1421×894 窗口 · 截图已脱敏</p>
   </footer>
 </div>
@@ -792,249 +792,10 @@
   document.querySelectorAll('section.tutorial').forEach(s=>obs.observe(s));
 </script>
 
-<!-- ============ AI 客服 · 小黑猫 ============ -->
-<div id="chat-widget" data-open="false">
-  <button id="chat-toggle" type="button" aria-label="打开小黑猫客服">
-    <img src="assets/neko-black.png" alt="小黑猫" class="neko-avatar">
-    <span class="bubble">问我</span>
-    <span class="close-x">✕</span>
-  </button>
-  <div id="chat-panel" hidden role="dialog" aria-label="pdf2zh 小黑猫客服">
-    <div class="chat-head">
-      <img src="assets/neko-black.png" alt="" class="head-avatar">
-      <div class="head-info">
-        <b>小黑猫</b>
-        <span class="sub">喵~ 帮你查文档</span>
-      </div>
-      <button id="chat-close" type="button" aria-label="收起">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6 L18 18 M18 6 L6 18"/></svg>
-      </button>
-    </div>
-    <div id="chat-msgs">
-      <div class="msg ai">喵~ 我是 pdf2zh 的小黑猫客服 🐾<br>有任何使用问题直接问我，比如：<br>「OCR 怎么用？」「Zotero 右键翻译怎么用？」「翻译卡 0% 怎么办？」</div>
-    </div>
-    <form id="chat-form">
-      <textarea id="chat-input" rows="2" placeholder="问 pdf2zh 使用问题…（Shift+Enter 换行）" maxlength="500"></textarea>
-      <button type="submit" id="chat-send">发送</button>
-    </form>
-  </div>
+<!-- ============ 联系作者 ============ -->
+<div style="position:fixed;bottom:24px;right:24px;z-index:9999;font:13px/1.5 -apple-system,'PingFang SC',sans-serif">
+  <a href="mailto:2994574297@qq.com" style="display:inline-block;background:#fff;border:1.5px solid #232323;border-radius:999px;padding:9px 18px;color:#232323;text-decoration:none;font-weight:600;box-shadow:0 6px 22px rgba(0,0,0,0.16)">📮 联系作者 QQ: 2994574297@qq.com</a>
 </div>
-<style>
-#chat-widget{position:fixed;bottom:24px;right:24px;z-index:9999;font:14px/1.5 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}
-#chat-toggle{position:relative;background:#fff;border:1.5px solid #232323;border-radius:999px;padding:6px 18px 6px 6px;box-shadow:0 6px 22px rgba(0,0,0,0.16),0 2px 6px rgba(0,0,0,0.06);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform 0.15s, box-shadow 0.15s}
-#chat-toggle:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.06)}
-#chat-toggle:hover .neko-avatar{animation:wiggle 0.6s ease-in-out infinite}
-@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
-.neko-avatar{width:42px;height:42px;border-radius:50%;display:block;object-fit:cover;background:#fff;border:1.5px solid #f0f0f3;transition:transform 0.2s}
-#chat-toggle .bubble{font-size:14px;font-weight:600;color:#232323;letter-spacing:0.3px}
-#chat-toggle .close-x{display:none;font-size:18px;color:#232323;font-weight:600;width:24px;text-align:center}
-#chat-widget[data-open="true"] #chat-toggle{padding:6px 14px 6px 6px}
-#chat-widget[data-open="true"] #chat-toggle .bubble{display:none}
-#chat-widget[data-open="true"] #chat-toggle .close-x{display:inline-block}
-#chat-panel{position:absolute;bottom:64px;right:0;width:380px;height:520px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 32px 80px rgba(0,0,0,0.24);display:flex;flex-direction:column;overflow:hidden;animation:slideUp 0.22s ease}
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.chat-head{padding:14px 16px;background:linear-gradient(135deg,#1a1a1f 0%,#2a2a30 100%);color:#fff;display:flex;align-items:center;gap:12px}
-.head-avatar{width:38px;height:38px;border-radius:50%;background:#fff;object-fit:cover;border:1.5px solid #B4D232;flex-shrink:0}
-.head-info{flex:1;min-width:0}
-.head-info b{display:block;font-size:14.5px;font-weight:600;letter-spacing:0.2px}
-.head-info .sub{display:block;font-size:11.5px;color:#B4D232;margin-top:1px;font-weight:400}
-.chat-head button{background:rgba(255,255,255,0.18);color:#fff;border:1.5px solid rgba(255,255,255,0.35);width:36px;height:36px;border-radius:50%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s, border-color 0.15s, transform 0.15s;flex-shrink:0;padding:0}
-.chat-head button:hover{background:#B4D232;border-color:#B4D232;color:#1a1a1f;transform:rotate(90deg)}
-.chat-head button svg{display:block;width:18px;height:18px;stroke-width:2.6}
-#chat-msgs{flex:1;padding:16px;overflow-y:auto;background:#fafafa;display:flex;flex-direction:column;gap:10px}
-#chat-msgs .msg{max-width:88%;padding:10px 14px;border-radius:14px;word-wrap:break-word;line-height:1.6;font-size:13.5px;white-space:pre-wrap}
-#chat-msgs .msg.user{background:#232323;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-#chat-msgs .msg.ai{background:#fff;border:1px solid #ebebef;color:var(--ink);align-self:flex-start;border-bottom-left-radius:4px}
-#chat-msgs .msg.ai code{background:#f0f0f3;padding:1px 5px;border-radius:4px;font-size:12.5px;font-family:SF Mono,Menlo,monospace}
-#chat-msgs .msg.err{background:#fff0ee;border:1px solid #ffd5cf;color:#a8261c}
-#chat-form{padding:12px;border-top:1px solid var(--line);display:flex;gap:8px;background:#fff}
-#chat-input{flex:1;padding:9px 12px;border:1px solid #d8d8de;border-radius:10px;font:inherit;font-size:13.5px;resize:none;outline:none;background:#fafafa}
-#chat-input:focus{border-color:#232323;background:#fff}
-#chat-send{background:#232323;color:#fff;border:none;border-radius:10px;padding:0 18px;font:inherit;font-weight:600;cursor:pointer;font-size:13.5px;transition:background 0.15s}
-#chat-send:hover:not(:disabled){background:#0a0a0a}
-#chat-send:disabled{opacity:0.5;cursor:not-allowed}
-@media (max-width:520px){
-  #chat-widget{bottom:18px;right:14px}
-  #chat-panel{width:calc(100vw - 28px);height:70vh;right:-7px}
-  #chat-toggle .lb{display:none}
-  #chat-toggle{padding:14px;border-radius:50%}
-}
-</style>
-<script>
-(function(){
-  // ↓↓↓ 部署 worker 后把这个 URL 改成实际地址 ↓↓↓
-  var WORKER_URL = 'https://q.metaeidos.com/chat';
 
-  var widget = document.getElementById('chat-widget');
-  var toggle = document.getElementById('chat-toggle');
-  var panel = document.getElementById('chat-panel');
-  var closeBtn = document.getElementById('chat-close');
-  var msgs = document.getElementById('chat-msgs');
-  var form = document.getElementById('chat-form');
-  var input = document.getElementById('chat-input');
-  var sendBtn = document.getElementById('chat-send');
-  var chatHistory = [];
-  var isOpen = false;
-
-  // 初始状态：关闭
-  panel.style.display = 'none';
-
-  function openChat(){
-    isOpen = true;
-    panel.style.display = 'flex';
-    panel.removeAttribute('hidden');
-    widget.setAttribute('data-open', 'true');
-    toggle.setAttribute('aria-label', '收起小黑猫客服');
-    setTimeout(function(){ try{input.focus();}catch(e){} }, 50);
-  }
-  function closeChat(){
-    isOpen = false;
-    panel.style.display = 'none';
-    panel.setAttribute('hidden', '');
-    widget.setAttribute('data-open', 'false');
-    toggle.setAttribute('aria-label', '打开小黑猫客服');
-  }
-  function toggleChat(e){
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    if (isOpen) closeChat(); else openChat();
-  }
-
-  // 1) 点 toggle 按钮（包括内部任意子元素）：打开/收起
-  toggle.addEventListener('click', toggleChat);
-
-  // 2) 点 header 里的 ✕：收起。用 capture 阶段确保最先触发
-  closeBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    closeChat();
-  }, true);
-
-  // 3) 按 Esc：收起
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape' && isOpen) {
-      e.preventDefault();
-      closeChat();
-    }
-  });
-
-  // 4) 点 widget 之外的页面区域：收起
-  document.addEventListener('click', function(e){
-    if (isOpen && !widget.contains(e.target)) closeChat();
-  });
-
-  function addMsg(text, cls){
-    var div = document.createElement('div');
-    div.className = 'msg ' + cls;
-    div.textContent = text;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-    return div;
-  }
-
-  async function send(text){
-    addMsg(text, 'user');
-    chatHistory.push({ role: 'user', content: text });
-    var aiDiv = addMsg('...', 'ai');
-    sendBtn.disabled = true;
-
-    try {
-      var resp = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history: chatHistory.slice(-8) }),
-      });
-
-      if (!resp.ok) {
-        var err = {};
-        try { err = await resp.json(); } catch(e){}
-        aiDiv.className = 'msg err';
-        aiDiv.textContent = err.error || ('错误 HTTP ' + resp.status);
-        return;
-      }
-
-      var acc = '';  // 提到 try 顶层，catch 也能访问
-      try {
-        var reader = resp.body.getReader();
-        var decoder = new TextDecoder();
-        var buf = '';
-        aiDiv.textContent = '';
-        while (true) {
-          var chunk = await reader.read();
-          if (chunk.done) break;
-          buf += decoder.decode(chunk.value, { stream: true });
-          var lines = buf.split('\n');
-          buf = lines.pop();
-          for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            if (!line.startsWith('data: ')) continue;
-            var data = line.slice(6).trim();
-            if (data === '[DONE]') continue;
-            try {
-              var j = JSON.parse(data);
-              var delta = (j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content) || '';
-              if (delta) {
-                acc += delta;
-                aiDiv.textContent = acc;
-                msgs.scrollTop = msgs.scrollHeight;
-              }
-            } catch(e){}
-          }
-        }
-      } catch (streamErr) {
-        // 流式中途断了：保留已收到的内容，不清空
-        if (acc) {
-          aiDiv.textContent = acc + '\n\n[连接中断，回答可能不完整]';
-        } else {
-          throw streamErr;  // 一字未收 → 走外层 catch 报错
-        }
-      }
-      if (acc) chatHistory.push({ role: 'assistant', content: acc });
-    } catch (e) {
-      // 只在 acc 为空（即什么都没收到）时显示纯错误
-      var existing = aiDiv.textContent || '';
-      if (existing && existing !== '...' && existing.indexOf('网络错误') === -1) {
-        // 已有内容，不覆盖
-      } else {
-        aiDiv.className = 'msg err';
-        aiDiv.textContent = '网络错误，请稍后重试';
-      }
-    } finally {
-      sendBtn.disabled = false;
-    }
-  }
-
-  form.onsubmit = function(e){
-    e.preventDefault();
-    var t = input.value.trim();
-    if (!t) return;
-    input.value = '';
-    autoResize();
-    send(t);
-  };
-  // 微信式：Enter 发送，Shift+Enter 换行
-  // 但要避开中文输入法拼音上屏时的 Enter（IME composition 期间不发送）
-  var composing = false;
-  input.addEventListener('compositionstart', function(){ composing = true; });
-  input.addEventListener('compositionend', function(){ composing = false; });
-  input.addEventListener('keydown', function(e){
-    // IME 拼音 / 选词期间 → 永不发送
-    if (composing || e.isComposing || e.keyCode === 229) return;
-    // Shift+Enter → 换行（默认行为，不拦截）
-    if (e.key === 'Enter' && e.shiftKey) return;
-    // 单独 Enter → 发送
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      form.dispatchEvent(new Event('submit', { cancelable: true }));
-    }
-  });
-  // 输入时自动撑高（最多 6 行）
-  function autoResize(){
-    input.style.height = 'auto';
-    var max = 6 * 20; // ~120px
-    input.style.height = Math.min(input.scrollHeight, max) + 'px';
-  }
-  input.addEventListener('input', autoResize);
-})();
-</script>
 </body>
 </html>

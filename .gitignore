@@ -14,7 +14,7 @@ config/user.json
 
 # Embedded Python runtime (too large for git)
 core/runtime/
-core/site-packages/
+core/site-packages/*
 
 # Only track our custom pdf2zh source (unignore)
 !core/site-packages/pdf2zh/
@@ -53,3 +53,25 @@ reference/
 
 # Isolated Codex development worktrees
 .worktrees/
+
+# IDE / local caches
+.vs/
+.idea/
+*.swp
+
+# Dev workspaces (Codex / planning scratch)
+computer-project-workspace/
+project_init/
+project_nginx/
+project_workspace/
+project_zips/
+
+# Temp & test artifacts
+tmp/
+*.sqlite
+*.db
+
+# PyInstaller build output
+launcher_src/build/
+dist/
+build/

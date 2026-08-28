@@ -7,7 +7,7 @@
 <br>
 <br>
 
-# 🌿 PaperFlow · PDF 翻译工作台 v2.3.17
+# 🌿 PaperFlow · PDF 翻译工作台 v2.3.19
 
 ### 开箱即用的 PDF 学术翻译神器 🚀
 
@@ -15,19 +15,19 @@
 
 **🖥️ 支持 Windows + macOS 双平台**
 
-[![Windows](https://img.shields.io/badge/Windows-10/11-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/GW19ddd/pdf2zh-desktop/releases)
-[![macOS](https://img.shields.io/badge/macOS-13.0+-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/GW19ddd/pdf2zh-desktop/releases)
+[![Windows](https://img.shields.io/badge/Windows-10/11-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/AaronGIG/pdf2zh-desktop/releases)
+[![macOS](https://img.shields.io/badge/macOS-13.0+-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/AaronGIG/pdf2zh-desktop/releases)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![Version](https://img.shields.io/badge/Version-2.3.17-blue?style=flat-square)](https://github.com/GW19ddd/pdf2zh-desktop/releases)
+[![Version](https://img.shields.io/badge/Version-2.3.19-blue?style=flat-square)](https://github.com/GW19ddd/pdf2zh-desktop/releases)
 
 <br>
 
 <table align="center"><tr><td align="center" style="padding:18px 28px">
-<h3>📘 强烈推荐先看 → <a href="https://gw19ddd.github.io/pdf2zh-desktop/">完整图文使用教程（macOS）</a></h3>
+<h3>📘 强烈推荐先看 → <a href="https://aarongig.github.io/pdf2zh-desktop/">完整图文使用教程（macOS）</a></h3>
 <p>真实截图 · 每一步带红圈编号 · 配 API · 扫描件处理 · 常见问题<br>
 <b>第一次使用？看完这一份就够了，省下你折腾两小时的时间。</b><br>
 💬 <i>页面右下角有 AI 客服「小黑猫」在线答疑，问任何使用问题都能秒回</i></p>
-<a href="https://gw19ddd.github.io/pdf2zh-desktop/"><img src="https://img.shields.io/badge/📘 点 这 里 看 教 程-FF6B35?style=for-the-badge&logoColor=white" alt="使用教程"></a>
+<a href="https://aarongig.github.io/pdf2zh-desktop/"><img src="https://img.shields.io/badge/📘 点 这 里 看 教 程-FF6B35?style=for-the-badge&logoColor=white" alt="使用教程"></a>
 </td></tr></table>
 
 <br>
@@ -58,7 +58,7 @@
   <a href="README_EN.md">English</a>
 </p>
 
-<sub>💬 用户交流群（QQ）：<b>1094195179</b>（pdf2zh桌面版交流群）</sub>
+<sub>💬 联系作者（QQ）：<b>2994574297@qq.com</b></sub>
 
 > 基于 [PDFMathTranslate](https://github.com/Byaidu/PDFMathTranslate)（EMNLP 2025）打造，在原项目基础上大幅增强桌面体验。
 
@@ -154,8 +154,8 @@
 
 | 平台 | 下载 | 大小 | 启动方式 |
 |------|------|------|---------|
-| 🪟 Windows | [`pdf2zh-desktop-win-v2.3.17.zip`](https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.17/pdf2zh-desktop-win-v2.3.17.zip) | ~287MB | 解压 → 双击 `pdf2zh.exe` |
-| 🍎 macOS | [`pdf2zh-desktop-mac-v2.3.17.zip`](https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.17/pdf2zh-desktop-mac-v2.3.17.zip) | ~228MB | 解压 → 双击 `pdf2zh.app` |
+| 🪟 Windows | [`pdf2zh-desktop-win-v2.3.19.zip`](https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.19/pdf2zh-desktop-win-v2.3.19.zip) | ~290MB | 解压 → 双击 `pdf2zh.exe` |
+| 🍎 macOS | [`pdf2zh-desktop-mac-v2.3.17.zip`](https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.17/pdf2zh-desktop-mac-v2.3.17.zip) | ~228MB | 解压 → 双击 `pdf2zh.app` |
 
 ### 🖱️ 第二步：启动
 
@@ -291,6 +291,16 @@
 
 ## 📋 更新日志
 
+### v2.3.19（2026-08-28）— Zotero 联动稳定性修复
+
+- 🔧 **修复「联动 Zotero」复选框等控件点击无响应**：高 DPI 缩放下窗口命中测试（`WM_NCHITTEST`）的物理/逻辑像素错位，导致设置页复选框、放大/缩小按钮以及窗口下半部分区域鼠标点击全部失效；现已统一由 Qt 高 DPI 策略换算坐标（同时移除启动脚本里重复的 `QT_AUTO_SCREEN_SCALE_FACTOR`，消除双重缩放冲突）
+- 🐛 **修复翻译完成后主界面卡死**：Zotero 回写改在后台线程执行，翻译完成立即返回界面，不再阻塞主线程；退出时安全等待回写线程结束，不再崩溃
+- 📦 **仓库整理**：移除已误提交的构建产物、嵌入式 Python 运行时与第三方依赖二进制，源码仓库大幅瘦身；完整可运行包改由 GitHub Release 提供
+
+### v2.3.18（2026-08-25）— Connector 插件升级 v1.0.31
+
+- 🔧 Connector 插件升级 v1.0.31：应用路径选择与偏好设置面板优化，右键联动翻译更稳定
+
 ### v2.3.17（2026-08-24）— PaperFlow 品牌焕新
 
 - 🎨 **UI 全面重绘为 macOS 风格**：无边框圆角窗口、自绘标题栏（红绿灯按钮）、左侧图标导航、浅色毛玻璃卡片、胶囊按钮、系统蓝强调色
@@ -354,7 +364,7 @@
 
 ### v2.3.6（2026-08-01）
 
-- 🔧 **修复自定义 / OpenAI 兼容 API（含硅基流动等）译文混入译者注**：给所有 OpenAI 兼容服务加上强约束提示词 + 输出兜底清洗，不再冒出「（注：…）」这类多余解释（[#27](https://github.com/GW19ddd/pdf2zh-desktop/issues/27)）
+- 🔧 **修复自定义 / OpenAI 兼容 API（含硅基流动等）译文混入译者注**：给所有 OpenAI 兼容服务加上强约束提示词 + 输出兜底清洗，不再冒出「（注：…）」这类多余解释（[#27](https://github.com/AaronGIG/pdf2zh-desktop/issues/27)）
 
 ### v2.3.5（2026-07-31）
 
@@ -439,9 +449,9 @@
 
 ## 👨‍💻 关于本项目
 
-**桌面版作者**：[@GW19ddd](https://github.com/GW19ddd) (CAS)
+**桌面版作者**：[@AaronGIG](https://github.com/AaronGIG)
 
-桌面版的独立打包、GUI 增强、便携化改造、Zotero 联动等功能由 GW19ddd (CAS) 与 Claude (Anthropic AI) 协作开发完成 🤖✨
+桌面版的独立打包、GUI 增强、便携化改造、Zotero 联动等功能由 AaronGIG 独立维护开发 🚀
 
 **核心翻译引擎**：[PDFMathTranslate](https://github.com/Byaidu/PDFMathTranslate)（EMNLP 2025），感谢原项目的贡献 🤝
 
@@ -453,6 +463,6 @@
 
 **专注交付生产级的垂直学术公共品** 🍀
 
-[GitHub](https://github.com/GW19ddd/pdf2zh-desktop) · [最新版本](https://github.com/GW19ddd/pdf2zh-desktop/releases/latest) · [反馈](https://github.com/GW19ddd/pdf2zh-desktop/issues) · [小红书: 艾伦说](https://www.xiaohongshu.com/user/profile/66c6fef7000000001d0315ef)
+[GitHub](https://github.com/AaronGIG/pdf2zh-desktop) · [最新版本](https://github.com/AaronGIG/pdf2zh-desktop/releases/latest) · [反馈](https://github.com/AaronGIG/pdf2zh-desktop/issues) · [联系作者](mailto:2994574297@qq.com)
 
 </div>

@@ -209,9 +209,9 @@ pdf2zh-desktop-win/
 
 ## 👨‍💻 About This Project
 
-**Desktop version author**: [@GW19ddd](https://github.com/GW19ddd) (CAS)
+**Desktop version author**: [@AaronGIG](https://github.com/AaronGIG)
 
-The standalone packaging, GUI enhancements, portable design, and smart diagnostics were co-developed by GW19ddd (CAS) and Claude (Anthropic AI) 🤖✨
+The standalone packaging, GUI enhancements, portable design, and smart diagnostics are maintained by AaronGIG 🚀
 
 **Core translation engine**: [PDFMathTranslate](https://github.com/Byaidu/PDFMathTranslate) (EMNLP 2025) — thanks to the original project 🤝
 

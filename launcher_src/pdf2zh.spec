@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['_stub.py'],
+    ['d:/03-Codes/pdf2zh-desktop/launcher_src/_stub.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['E:\\tool\\pdf2zh\\pdf2zh-desktop-win\\assets\\icon.ico'],
+    icon=['d:/03-Codes/pdf2zh-desktop/assets/icon.ico'],
 )

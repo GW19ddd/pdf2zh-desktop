@@ -10,9 +10,9 @@ export default {
   id: pkg.config.addonID,
   namespace: pkg.config.addonRef,
   xpiName: "paperflow-connector-v1.0.0",
-  updateURL: "https://raw.githubusercontent.com/GW19ddd/pdf2zh-desktop/main/updates.json",
+  updateURL: "https://raw.githubusercontent.com/AaronGIG/pdf2zh-desktop/main/updates.json",
   xpiDownloadLink:
-    "https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v{{version}}/{{xpiName}}.xpi",
+    "https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v{{version}}/{{xpiName}}.xpi",
 
   build: {
     assets: ["addon/**/*.*"],
