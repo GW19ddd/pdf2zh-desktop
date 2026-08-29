@@ -1,0 +1,132 @@
+# ==========================================================
+# pdf2zh-desktop 增量发布工作流
+#
+# 触发方式：
+#   1) 打 tag 自动触发:  git tag v2.3.20 && git push origin v2.3.20
+#   2) 手动触发:         Actions 页面 → Run workflow → 填版本号（可留空）
+#
+# 原理（增量发布）：
+#   - 运行时（core/runtime 等约 1.1GB）不在 git 仓库内
+#   - 因此从"最近一个带 zip 附件的 Release"下载基础包
+#   - 解压后仅用仓库代码覆盖 ui / core\site-packages\pdf2zh / 顶层文件
+#   - 重新打包并上传到目标 tag 的 Release（已存在则 --clobber 覆盖）
+#
+# 首次使用前，请先在本地运行一次 publish.bat 生成基础 zip 并上传。
+# ==========================================================
+
+name: Incremental Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号，如 2.3.20（留空则用最新 release tag）'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 解析版本号
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = ''
+          if ($env:GITHUB_EVENT_NAME -eq 'push') {
+            $tag = $env:GITHUB_REF_NAME
+          }
+          $manualVer = "${{ github.event.inputs.version }}"
+          if ($manualVer) {
+            $tag = "v$($manualVer.TrimStart('v'))"
+          }
+          if (-not $tag) {
+            $tag = gh release list --limit 1 --json tagName -q '.[0].tagName'
+          }
+          if (-not $tag) { Write-Error '无法确定版本号，请填写 version 或先创建任意 Release' }
+          $ver = $tag.TrimStart('v')
+          "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VER=$ver" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "ZIP=pdf2zh-desktop-win-v$ver.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "ROOT=pdf2zh-desktop-win-v$ver" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "目标版本: $tag (ver=$ver)"
+
+      - name: 下载基础包（最近带 zip 附件的 Release）
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -ItemType Directory -Force base | Out-Null
+          $tags = gh release list --limit 10 --json tagName -q '.[].tagName'
+          $baseTag = $null
+          foreach ($t in $tags) {
+            $zipName = gh release view $t --json assets -q '.assets[].name' |
+              Where-Object { $_ -like 'pdf2zh-desktop-win-v*.zip' } | Select-Object -First 1
+            if ($zipName) { $baseTag = $t; break }
+          }
+          if (-not $baseTag) {
+            Write-Error '未找到历史 zip 包。首次发布请先在本地运行 publish.bat 生成基础包并上传。'
+          }
+          Write-Host "基础包来源 Release: $baseTag"
+          gh release download $baseTag --pattern 'pdf2zh-desktop-win-v*.zip' --dir base --clobber
+          $zip = Get-ChildItem base -Filter '*.zip' | Select-Object -First 1
+          Write-Host "解压: $($zip.Name)"
+          tar -xf $zip.FullName -C base
+          $oldRoot = Get-ChildItem base -Directory |
+            Where-Object { $_.Name -like 'pdf2zh-desktop-win-v*' } | Select-Object -First 1
+          if ($oldRoot.Name -ne $env:ROOT) {
+            Write-Host "重命名包根目录: $($oldRoot.Name) -> $env:ROOT"
+            Rename-Item -Path $oldRoot.FullName -NewName $env:ROOT
+          }
+
+      - name: 同步仓库代码到包内
+        shell: pwsh
+        run: |
+          $root = "base/$env:ROOT"
+          Remove-Item "$root/ui" -Recurse -Force -ErrorAction SilentlyContinue
+          Copy-Item -Recurse -Force 'ui' "$root/ui"
+          Remove-Item "$root/core/site-packages/pdf2zh" -Recurse -Force -ErrorAction SilentlyContinue
+          Copy-Item -Recurse -Force 'core/site-packages/pdf2zh' "$root/core/site-packages/pdf2zh"
+          $files = @('_launcher.py','install.bat','pdf2zh.bat','README.md','README_EN.md','updates.json')
+          foreach ($f in $files) {
+            if (Test-Path $f) { Copy-Item -Force $f "$root/$f"; Write-Host "同步: $f" }
+          }
+          Write-Host '代码同步完成'
+
+      - name: 打包 zip
+        shell: pwsh
+        run: |
+          tar -a -c -f "$env:ZIP" `
+            --exclude='logs' --exclude='pdf2zh_files' --exclude='__pycache__' `
+            --exclude='*.pyc' --exclude='*.sqlite' --exclude='*.db' --exclude='.vs' `
+            -C base "$env:ROOT"
+          if ($LASTEXITCODE -ne 0) { Write-Error '打包失败' }
+          $f = Get-Item "$env:ZIP"
+          Write-Host "打包完成: $($f.Name) $([math]::Round($f.Length/1MB,1)) MB"
+
+      - name: 创建/更新 Release 并上传
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:TAG
+          $exists = gh release view $tag --json tagName -q '.tagName' 2>$null
+          if (-not $exists) {
+            Write-Host "Release $tag 不存在，创建中..."
+            gh release create $tag --generate-notes
+            if ($LASTEXITCODE -ne 0) { Write-Error '创建 Release 失败' }
+          }
+          gh release upload $tag "$env:ZIP" --clobber
+          if ($LASTEXITCODE -ne 0) { Write-Error '上传失败' }
+          Write-Host "发布完成: https://github.com/$env:GITHUB_REPOSITORY/releases/tag/$tag"
