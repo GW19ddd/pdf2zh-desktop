@@ -2,7 +2,7 @@
 
 <br>
 
-<img src="assets/icon.png" width="128" height="128" alt="PaperFlow" style="border-radius: 22px;">
+<img src="assets/paperflow.png" width="128" height="128" alt="PaperFlow" style="border-radius: 22px;">
 
 <br>
 <br>
@@ -127,7 +127,7 @@
 
 - 🔗 **自动检测**：从 Zotero 拖入 PDF 或条目，自动识别来源
 - 📎 **自动关联**：翻译完成后译文自动添加为 Zotero 附件，不留冗余副本
-- 🔌 **一键安装插件**：设置页一键安装 pdf2zh Connector（Windows / macOS），开箱即用
+- 🔌 **一键安装插件**：设置页一键安装 PaperFlow Connector（Windows / macOS），开箱即用
 - 📐 **格式多选**：左右并排 / 双语对照 / 仅译文，任意组合放回 Zotero
 - 🖱️ **右键直接翻译**：Zotero 条目树或 PDF 阅读器内对 PDF 右键 → 「📖 用 PaperFlow 翻译」，格式跟随右键菜单选择
 - 🌙 **后台静默翻译**：右键菜单勾选后不弹窗、不抢焦点，翻完自动关窗
@@ -154,19 +154,19 @@
 
 | 平台 | 下载 | 大小 | 启动方式 |
 |------|------|------|---------|
-| 🪟 Windows | [`pdf2zh-desktop-win-v2.3.19.zip`](https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.19/pdf2zh-desktop-win-v2.3.19.zip) | ~290MB | 解压 → 双击 `pdf2zh.exe` |
-| 🍎 macOS | [`pdf2zh-desktop-mac-v2.3.17.zip`](https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.17/pdf2zh-desktop-mac-v2.3.17.zip) | ~228MB | 解压 → 双击 `pdf2zh.app` |
+| 🪟 Windows | [`pdf2zh-desktop-win-v2.3.19.zip`](https://github.com/GW19ddd/pdf2zh-desktop/releases/download/v2.3.19/pdf2zh-desktop-win-v2.3.19.zip) | ~290MB | 解压 → 双击 `paperflow.exe` |
+| 🍎 macOS | [`pdf2zh-desktop-mac-v2.3.17.zip`](https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.17/pdf2zh-desktop-mac-v2.3.17.zip) | ~228MB | 解压 → 双击 `paperflow.app` |
 
 ### 🖱️ 第二步：启动
 
 - **Windows**：解压后看到多个文件，**多种方式并存，按需选**——
-  - 🟢 **推荐 / 最省心**：直接双击 **`pdf2zh.exe`**，不需要任何安装步骤，解压即用，首次使用和日常使用都是这一个
-  - 🟢 **等价备选**：`pdf2zh.vbs`（无控制台窗口）/ `pdf2zh.bat`（保留控制台便于看输出），效果和 `pdf2zh.exe`完全一样，个人喜好选一个
-  - 🟡 **想要桌面图标 / 开始菜单，建议做一次**：双击 **`install.bat`**（顺带自动检查/安装 VC++ 运行库；跑完就没用了，不做也完全不影响用 `pdf2zh.exe` 正常使用，只是桌面上不会有图标）
+  - 🟢 **推荐 / 最省心**：直接双击 **`paperflow.exe`**，不需要任何安装步骤，解压即用，首次使用和日常使用都是这一个
+  - 🟢 **等价备选**：`paperflow.vbs`（无控制台窗口）/ `paperflow.bat`（保留控制台便于看输出），效果和 `paperflow.exe`完全一样，个人喜好选一个
+  - 🟡 **想要桌面图标 / 开始菜单，建议做一次**：双击 **`install.bat`**（顺带自动检查/安装 VC++ 运行库；跑完就没用了，不做也完全不影响用 `paperflow.exe` 正常使用，只是桌面上不会有图标）
   - 🟡 **遇到问题**：双击 `debug_start.bat`（看启动日志）或 `diagnostic.bat`（系统诊断）；改设置用 `config_manager.bat`
   - 🔴 **卸载**：双击 `uninstall.bat`
-  - ⚠️ `install.bat`/`uninstall.bat`/`debug_start.bat`/`diagnostic.bat`/`config_manager.bat` 这几个是批处理脚本，v2.3.9 起已修复中文 Windows 上的编码乱码问题；`pdf2zh.exe`/`pdf2zh.vbs` 不受此类问题影响，追求最稳就选它们
-- **macOS**：双击 `pdf2zh.app`；首次启动若提示「**已损坏，无法打开**」，终端跑一行：`xattr -cr /Applications/pdf2zh.app`，或 Finder 里**右键 → 打开**
+  - ⚠️ `install.bat`/`uninstall.bat`/`debug_start.bat`/`diagnostic.bat`/`config_manager.bat` 这几个是批处理脚本，v2.3.9 起已修复中文 Windows 上的编码乱码问题；`paperflow.exe`/`paperflow.vbs` 不受此类问题影响，追求最稳就选它们
+- **macOS**：双击 `paperflow.app`；首次启动若提示「**已损坏，无法打开**」，终端跑一行：`xattr -cr /Applications/paperflow.app`，或 Finder 里**右键 → 打开**
 
 ### 📄 第三步：翻译
 
@@ -203,25 +203,25 @@
 ## 🔗 Zotero 深度联动
 
 ```
-从 Zotero 拖论文到 pdf2zh → 翻译 → 译文自动出现在 Zotero 附件栏
+从 Zotero 拖论文到 paperflow → 翻译 → 译文自动出现在 Zotero 附件栏
 ```
 
 1. **设置页** → Zotero 联动 → 「一键安装 Zotero 插件」（Windows / macOS 均可）→ 重启 Zotero
-2. 从 Zotero **拖条目或 PDF 附件**到 pdf2zh 窗口，或直接在 Zotero 里对 PDF **右键翻译**
+2. 从 Zotero **拖条目或 PDF 附件**到 paperflow 窗口，或直接在 Zotero 里对 PDF **右键翻译**
 3. 翻译 → 译文自动挂回原条目：普通附件复制进条目存储；**链接附件**（zotmoov / attanger 移走 PDF 时）译文放在原 PDF 同目录，并作为链接附件关联回条目
 
 > 插件只装一次，无需每次操作。没装 Zotero 的用户完全不受影响。
 
 **更快的方式：Zotero 里右键直接翻译**
 
-不用打开 pdf2zh——在 Zotero 里对着 PDF **右键 → 「📖 用 PaperFlow 翻译」**即可：
+不用打开 paperflow——在 Zotero 里对着 PDF **右键 → 「📖 用 PaperFlow 翻译」**即可：
 
 - **条目树右键**：选中一个或多个 PDF 附件（或含 PDF 的文献条目）直接翻译，格式可单独选：中外并排 / 上下双语 / 纯中文 / 全部 3 种
 - **PDF 阅读器内右键**：正在阅读的 PDF 也能右键翻译
 - **一键翻译**：使用 Zotero 插件设置面板里的默认格式
 - **后台静默翻译**：右键菜单勾选后不弹窗、不抢焦点，翻完自动关窗，适合批量挂后台
 
-**插件设置面板**（Zotero → 设置 → pdf2zh 翻译）
+**插件设置面板**（Zotero → 设置 → paperflow 翻译）
 
 - 默认翻译格式：中外并排 / 上下双语 / 纯中文 / 全部 3 种
 - 静默翻译开关、翻译完成后在 Zotero 中定位该文献
@@ -274,7 +274,7 @@
 
 | 😰 遇到了啥？ | 💡 这样解决 |
 | --- | --- |
-| 双击 vbs 报"不兼容" | Windows 11 24H2 废弃了 VBScript，请改用 `pdf2zh.bat` |
+| 双击 vbs 报"不兼容" | Windows 11 24H2 废弃了 VBScript，请改用 `paperflow.bat` |
 | macOS 提示"无法验证开发者" | 右键 → 打开 → 确认（仅需一次） |
 | 翻译中途断了 | 检查磁盘空间，重启后自动从缓存续接 |
 | 排版错乱 / 乱码 | 试试勾选「跳过字体子集」 |
@@ -285,7 +285,7 @@
 | 怎么用 DeepSeek？ | 选 DeepSeek → 填 API Key → 选模型 |
 | 怎么用自己的 API？ | 选「OpenAI 兼容格式」→ 快捷预设一键配置 |
 | 怎么保证术语准确？ | 展开「术语库」→ 选学科模板或自定义 |
-| Zotero 翻译后没显示附件？ | 设置页点「一键安装插件」或从 Releases 下载最新 pdf2zh Connector xpi（v1.0.0） |
+| Zotero 翻译后没显示附件？ | 设置页点「一键安装插件」或从 Releases 下载最新 PaperFlow Connector xpi（v1.0.0） |
 
 ---
 
@@ -311,8 +311,8 @@
 
 - 🔧 **修复右键翻译后「Zotero 联动失败」**：桌面端回写函数 `zotero_writeback` 未导入导致 `NameError`，且右键传入的 `--zotero-key` 未保存到窗口实例；现在链接附件（zotero 移动 / zotmoov 等场景）的译文会正确放回原 PDF 同目录并关联回条目
 - 🐛 **修复 Connector 插件链接附件判断**：Zotero 9 的 `LINK_MODE_LINKED_FILE` 常量是 `2`（此前误判为 `3`），链接附件译文改用 `linkFromFile` 放回原目录，不再被复制进 storage
-- ✨ **Connector 插件全新改版 v1.0.0（PaperFlow Connector for Zotero）**：右键菜单、插件设置面板、自动更新（updates.json 指向本仓库）全部可用；`assets/pdf2zh-connector.xpi` 与 Release 产物同步
-- 🔧 **修复插件设置面板「浏览应用路径」无效**：Zotero 7/9 移除了扩展里的 `Components`，改用 `Zotero.FilePicker`，现在可以自己选择 `pdf2zh.exe` 路径（也支持手动输入）
+- ✨ **Connector 插件全新改版 v1.0.0（PaperFlow Connector for Zotero）**：右键菜单、插件设置面板、自动更新（updates.json 指向本仓库）全部可用；`assets/paperflow-connector.xpi` 与 Release 产物同步
+- 🔧 **修复插件设置面板「浏览应用路径」无效**：Zotero 7/9 移除了扩展里的 `Components`，改用 `Zotero.FilePicker`，现在可以自己选择 `paperflow.exe` 路径（也支持手动输入）
 
 ### v2.3.16（2026-08-21）
 
@@ -350,7 +350,7 @@
 
 ### v2.3.9（2026-08-10）
 
-- 🔧 **修复 Windows 安装脚本乱码崩溃**：`install.bat` 等批处理脚本在部分中文 Windows 上会因编码问题乱码崩溃（详见下方「启动」章节说明）；同时调整首次启动的推荐方式，`pdf2zh.exe` 现在是首选，`install.bat` 降级为可选的快捷方式创建工具
+- 🔧 **修复 Windows 安装脚本乱码崩溃**：`install.bat` 等批处理脚本在部分中文 Windows 上会因编码问题乱码崩溃（详见下方「启动」章节说明）；同时调整首次启动的推荐方式，`paperflow.exe` 现在是首选，`install.bat` 降级为可选的快捷方式创建工具
 
 ### v2.3.8（2026-08-10）
 
@@ -383,7 +383,7 @@
 
 ### v2.3.0（2026-07-17）
 
-- ✨ **新增 Zotero 右键翻译**：不用打开 pdf2zh，Zotero 里对 PDF 右键直接翻译，自动作为子附件加回原文献
+- ✨ **新增 Zotero 右键翻译**：不用打开 paperflow，Zotero 里对 PDF 右键直接翻译，自动作为子附件加回原文献
 - ✨ 支持单文件输出格式选择（仅并排 / 仅双语 / 仅译文）
 
 ### v2.2.6（2026-04-28）— API Key 配置修复 + DeepSeek V4 模型支持 + 内置 OCR 引擎升级
@@ -401,7 +401,7 @@
 #### Zotero 深度联动
 - Zotero 条目/PDF 附件拖拽识别（解析 x-moz-custom-clipdata MIME）
 - 翻译完成自动回写 + 通过插件自动关联附件
-- 一键安装 pdf2zh Connector 插件（自动写 extensions.json + 重启 Zotero）
+- 一键安装 PaperFlow Connector 插件（自动写 extensions.json + 重启 Zotero）
 - 附件标题带格式标签（`side by side - 论文名`）
 - 智能数据目录检测（读 prefs.js 自定义路径 + 多磁盘扫描 + 选最大库）
 - 支持内置存储 / 绝对链接 / 相对链接三种附件格式

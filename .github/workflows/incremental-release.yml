@@ -58,8 +58,8 @@ jobs:
           $ver = $tag.TrimStart('v')
           "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
           "VER=$ver" | Out-File -FilePath $env:GITHUB_ENV -Append
-          "ZIP=pdf2zh-desktop-win-v$ver.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
-          "ROOT=pdf2zh-desktop-win-v$ver" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "ZIP=paperflow-desktop-win-v$ver.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "ROOT=paperflow-desktop-win-v$ver" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "目标版本: $tag (ver=$ver)"
 
       - name: 下载基础包（最近带 zip 附件的 Release）
@@ -72,19 +72,19 @@ jobs:
           $baseTag = $null
           foreach ($t in $tags) {
             $zipName = gh release view $t --json assets -q '.assets[].name' |
-              Where-Object { $_ -like 'pdf2zh-desktop-win-v*.zip' } | Select-Object -First 1
+              Where-Object { $_ -like 'paperflow-desktop-win-v*.zip' } | Select-Object -First 1
             if ($zipName) { $baseTag = $t; break }
           }
           if (-not $baseTag) {
             Write-Error '未找到历史 zip 包。首次发布请先在本地运行 publish.bat 生成基础包并上传。'
           }
           Write-Host "基础包来源 Release: $baseTag"
-          gh release download $baseTag --pattern 'pdf2zh-desktop-win-v*.zip' --dir base --clobber
+          gh release download $baseTag --pattern 'paperflow-desktop-win-v*.zip' --dir base --clobber
           $zip = Get-ChildItem base -Filter '*.zip' | Select-Object -First 1
           Write-Host "解压: $($zip.Name)"
           tar -xf $zip.FullName -C base
           $oldRoot = Get-ChildItem base -Directory |
-            Where-Object { $_.Name -like 'pdf2zh-desktop-win-v*' } | Select-Object -First 1
+            Where-Object { $_.Name -like 'paperflow-desktop-win-v*' } | Select-Object -First 1
           if ($oldRoot.Name -ne $env:ROOT) {
             Write-Host "重命名包根目录: $($oldRoot.Name) -> $env:ROOT"
             Rename-Item -Path $oldRoot.FullName -NewName $env:ROOT

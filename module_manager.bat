@@ -1,11 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: pdf2zh 桌面版模块管理器
-title pdf2zh 桌面版 - 模块管理器
+:: PaperFlow 桌面版模块管理器
+title PaperFlow 桌面版 - 模块管理器
 
 echo ================================================================
-echo   pdf2zh 桌面版 - 模块管理器
+echo   PaperFlow 桌面版 - 模块管理器
 echo ================================================================
 echo.
 
@@ -25,7 +25,7 @@ if not exist "%CONFIG_FILE%" (
 :menu
 cls
 echo ================================================================
-echo   pdf2zh 桌面版 - 模块管理器
+echo   PaperFlow 桌面版 - 模块管理器
 echo ================================================================
 echo.
 echo 当前已安装模块:
@@ -36,9 +36,9 @@ if exist "core\runtime\python.exe" (
 )
 
 if exist "core\site-packages\pdf2zh" (
-    echo [✓] PDF2ZH 库 - 已安装
+    echo [✓] PaperFlow 翻译引擎 - 已安装
 ) else (
-    echo [✗] PDF2ZH 库 - 未安装
+    echo [✗] PaperFlow 翻译引擎 - 未安装
 )
 
 if exist "models\layout" (
@@ -207,5 +207,5 @@ pause
 goto menu
 
 :exit
-echo 感谢使用 pdf2zh 桌面版模块管理器！
+echo 感谢使用 PaperFlow 桌面版模块管理器！
 exit /b 0

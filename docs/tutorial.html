@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>pdf2zh-desktop · macOS 使用教程</title>
+<title>paperflow-desktop · macOS 使用教程</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,7 +101,7 @@
 <nav class="top">
   <div class="inner">
     <span class="me-logo">PaperFlow</span>
-    <span class="brand">pdf2zh-desktop<span class="ver">macOS · v2.3.9</span></span>
+    <span class="brand">paperflow-desktop<span class="ver">macOS · v2.3.9</span></span>
     <a href="#install" class="tab">安装</a>
     <a href="#sec-translate" class="tab">翻译</a>
     <a href="#sec-settings" class="tab">设置</a>
@@ -133,7 +133,7 @@
   <header class="hero">
     <div class="eyebrow">macOS Edition · v2.3.9</div>
     <h1>把外文论文翻成<span class="grad">中文 PDF</span><br>排版照旧、公式不糊</h1>
-    <p class="sub">pdf2zh-desktop 是一款 macOS 学术 PDF 翻译工具，保留原始排版、公式、图表，支持多家翻译服务，自带阅读器与 AI 助手。本教程用真实截图带你走完每一步操作。</p>
+    <p class="sub">paperflow-desktop 是一款 macOS 学术 PDF 翻译工具，保留原始排版、公式、图表，支持多家翻译服务，自带阅读器与 AI 助手。本教程用真实截图带你走完每一步操作。</p>
     <div class="meta">
       <span>📐 保留排版</span>
       <span>🧮 公式不糊</span>
@@ -149,7 +149,7 @@
       <span class="num">START</span>
       <h2>安装与启动</h2>
     </div>
-    <p class="lead">从 GitHub Release 下载 <code>pdf2zh-desktop-mac-vx.x.x.zip</code>，解压后把 <code>pdf2zh-desktop.app</code> 拖到「应用程序」即可。首次启动如果系统提示「无法验证开发者」，请去 <strong>系统设置 → 隐私与安全性</strong> 点「仍要打开」。</p>
+    <p class="lead">从 GitHub Release 下载 <code>paperflow-desktop-mac-vx.x.x.zip</code>，解压后把 <code>paperflow-desktop.app</code> 拖到「应用程序」即可。首次启动如果系统提示「无法验证开发者」，请去 <strong>系统设置 → 隐私与安全性</strong> 点「仍要打开」。</p>
     <div class="notice info">
       <span class="ico">ⓘ</span>
       <div>
@@ -160,8 +160,8 @@
       <span class="ico">⚠</span>
       <div>
         <strong>提示「文件已损坏 / 已损坏，无法打开」？</strong> 不是真的损坏，是 macOS Gatekeeper 拦了未签名 App。终端跑一行解决：<br>
-        <code>xattr -cr /Applications/pdf2zh.app</code><br>
-        如果还在 Downloads 没拖：<code>xattr -cr ~/Downloads/pdf2zh.app</code>。也可以 Finder 里<strong>右键 → 打开</strong>（不是双击），弹窗点「打开」即可。
+        <code>xattr -cr /Applications/paperflow.app</code><br>
+        如果还在 Downloads 没拖：<code>xattr -cr ~/Downloads/paperflow.app</code>。也可以 Finder 里<strong>右键 → 打开</strong>（不是双击），弹窗点「打开」即可。
       </div>
     </div>
     <div class="notice tip">
@@ -171,7 +171,7 @@
         <span style="color:#1d6d3a">✅ 表现最稳：</span>学术论文（IEEE / Springer / Nature / arXiv）、技术文档、白皮书、财报、标准教材、政策文件、专利<br>
         <span style="color:#7a5a00">⚠️ 可用但效果一般：</span>课本、画册、杂志（图文混排重、艺术字体多）— 译文可能错位、艺术标题可能被跳过；扫描件（建议先 OCR 加文字层）<br>
         <span style="color:#a8261c">❌ 不推荐：</span>儿童绘本 / 漫画 / 纯手写笔记 / 重设计版面（这类 PDF 文字嵌图为主，引擎能力之外）<br>
-        <em style="color:#666;font-size:13px">pdf2zh 引擎专为「标准学术排版」设计，复杂版面属于已知能力边界。</em>
+        <em style="color:#666;font-size:13px">paperflow 引擎专为「标准学术排版」设计，复杂版面属于已知能力边界。</em>
       </div>
     </div>
   </section>
@@ -264,7 +264,7 @@
       <div class="step"><div class="badge">7</div><div class="body"><h4>翻译设置</h4><p>四个开关：<strong>深色模式</strong>（界面跟随）/ <strong>翻译缓存</strong>（建议开 · 同一段重复翻只调一次 API）/ <strong>AI 布局检测</strong>（实验性，开了会更准但更慢）/ <strong>字体子集化</strong>（开了输出 PDF 更小）。</p></div></div>
       <div class="step"><div class="badge">8</div><div class="body"><h4>翻译提示词</h4><p>给 AI 的指令模板。默认「直译」，你可以改成「学术」「口语」「保留专业术语」等风格，<strong>支持多套预设</strong>，点「保存 / 新建 / 导入 / 导出」管理。改完点「保存」生效。</p></div></div>
       <div class="step"><div class="badge">9</div><div class="body"><h4>术语表</h4><p>固定专业名词的翻法。比如 <code>Transformer → Transformer（不译）</code>、<code>token → 词元</code>。<strong>每个学科一份术语表</strong>，翻译前选对的一份。</p></div></div>
-      <div class="step"><div class="badge">10</div><div class="body"><h4>Zotero 联动（Zotero 7/8/9 通用 · v2.3.0 新增右键翻译）</h4><p>把翻译好的 PDF <b>作为原文献的子附件自动加入 Zotero</b>。点「一键安装」装 Zotero 插件（当前 <code>v1.0.19</code>（PaperFlow Connector for Zotero，跟原版 pdf2zh 区分），兼容 Zotero 7/8/9 整个系列）。<br><b>🚀 v2.3.0 新增</b>：在 Zotero 里对 PDF <b>右键 → 「📖 用 PaperFlow 翻译」</b> 一键翻译，还能选单文件输出（并排/双语/纯中文，<b>v2.3.4 起格式选择严格生效</b>），不用打开 pdf2zh。<br><b>🆕 v2.3.4 新增</b>：右键菜单可勾选 <b>「后台静默翻译」</b>，翻译时不弹窗、不抢占前台，最小化后台完成翻译并回写 Zotero，全部成功后自动关窗。<br><b>翻译前会自动检查</b>插件是否响应，翻译完状态栏显示同步结果。<a href="#faq">→ 同步没成功？看 FAQ</a></p></div></div>
+      <div class="step"><div class="badge">10</div><div class="body"><h4>Zotero 联动（Zotero 7/8/9 通用 · v2.3.0 新增右键翻译）</h4><p>把翻译好的 PDF <b>作为原文献的子附件自动加入 Zotero</b>。点「一键安装」装 Zotero 插件（当前 <code>v1.0.19</code>（PaperFlow Connector for Zotero，跟原版 pdf2zh 区分），兼容 Zotero 7/8/9 整个系列）。<br><b>🚀 v2.3.0 新增</b>：在 Zotero 里对 PDF <b>右键 → 「📖 用 PaperFlow 翻译」</b> 一键翻译，还能选单文件输出（并排/双语/纯中文，<b>v2.3.4 起格式选择严格生效</b>），不用打开 paperflow。<br><b>🆕 v2.3.4 新增</b>：右键菜单可勾选 <b>「后台静默翻译」</b>，翻译时不弹窗、不抢占前台，最小化后台完成翻译并回写 Zotero，全部成功后自动关窗。<br><b>翻译前会自动检查</b>插件是否响应，翻译完状态栏显示同步结果。<a href="#faq">→ 同步没成功？看 FAQ</a></p></div></div>
       <div class="step"><div class="badge">11</div><div class="body"><h4>打开数据目录</h4><p>跳转到 <code>~/.config/pdf2zh/</code>。出问题时把 <code>config.json</code> 和 <code>history.json</code> 截图发给我们排查。<strong>不要手动改</strong>这两个文件，App 会覆盖。</p></div></div>
     </div>
 
@@ -499,7 +499,7 @@
       <span class="num">OCR</span>
       <h2>扫描版 PDF · 文字层补全方案</h2>
     </div>
-    <p class="lead">如果你的 PDF 是扫描件（图片型，选不了文字、复制不出来），翻译页的「OCR 识别」勾选框只能做<strong>非常基础的文字识别</strong>，对复杂版面、公式、表格、多栏论文识别率低。<strong>强烈建议先用专业 OCR 软件</strong>给 PDF 加一层文字层，再回到 pdf2zh 翻译，效果天差地别。</p>
+    <p class="lead">如果你的 PDF 是扫描件（图片型，选不了文字、复制不出来），翻译页的「OCR 识别」勾选框只能做<strong>非常基础的文字识别</strong>，对复杂版面、公式、表格、多栏论文识别率低。<strong>强烈建议先用专业 OCR 软件</strong>给 PDF 加一层文字层，再回到 paperflow 翻译，效果天差地别。</p>
 
     <div class="grid">
       <div class="card">
@@ -582,7 +582,7 @@
         <ol style="margin-top:8px;padding-left:20px;line-height:2">
           <li>扫描 PDF → 用 <strong>白描 / ABBYY / OCRmyPDF</strong> 加文字层 → 输出新 PDF</li>
           <li>用 Acrobat / Preview 打开新 PDF，确认能选中文字、能复制</li>
-          <li>把这个新 PDF 拖进 pdf2zh-desktop · <strong>不勾「扫描版 PDF」「OCR 识别」</strong></li>
+          <li>把这个新 PDF 拖进 paperflow-desktop · <strong>不勾「扫描版 PDF」「OCR 识别」</strong></li>
           <li>正常翻译 — 这时候得到的版式、公式、术语效果就跟原生 PDF 一样好</li>
         </ol>
       </div>
@@ -686,7 +686,7 @@
       </div>
       <div class="card">
         <div class="top"><h5>App 打开闪退 / 崩溃？</h5></div>
-        <p class="desc">删掉 <code>~/.cache/babeldoc</code>，再重新打开（会重新下载字体）。还不行去 GitHub Issue 贴日志：<code>~/Library/Logs/pdf2zh-desktop/</code>。</p>
+        <p class="desc">删掉 <code>~/.cache/babeldoc</code>，再重新打开（会重新下载字体）。还不行去 GitHub Issue 贴日志：<code>~/Library/Logs/paperflow-desktop/</code>。</p>
       </div>
       <div class="card">
         <div class="top"><h5>翻译质量不如预期？</h5></div>
@@ -741,7 +741,7 @@
 
       <div class="card">
         <div class="top"><h5>双击 App 提示「已损坏，无法打开」？</h5></div>
-        <p class="desc"><b>不是真的损坏</b>。macOS Gatekeeper 拦了未购买 Apple 开发者证书的 App。终端跑一行立刻解决：<br><code>xattr -cr /Applications/pdf2zh.app</code><br>或者 Finder 里<b>右键 → 打开</b>（不是双击），弹窗点「打开」即可，之后双击都正常。</p>
+        <p class="desc"><b>不是真的损坏</b>。macOS Gatekeeper 拦了未购买 Apple 开发者证书的 App。终端跑一行立刻解决：<br><code>xattr -cr /Applications/paperflow.app</code><br>或者 Finder 里<b>右键 → 打开</b>（不是双击），弹窗点「打开」即可，之后双击都正常。</p>
       </div>
 
       <div class="card">
@@ -750,19 +750,19 @@
         <b>关键：不要看物理磁盘路径</b>，看 Zotero 里那篇原论文 → <b>展开</b> → 有没有出现「<code>Translated PDF - xxx</code>」子附件。<br>
         <b>没有子附件 = 联动失败</b>，v2.2.5+ / v2.2.6+ 会在状态栏给出明确原因：<br>
         - ❌ <b>Zotero 未打开</b> → 请打开 Zotero 后重新翻译<br>
-        - ❌ <b>插件未装/未启用</b> → 下载最新 <a href="https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.9/pdf2zh-connector-v1.0.19.xpi"><code>pdf2zh-connector-v1.0.19.xpi</code></a>，Zotero 里「工具 → 附加组件 → ⚙ → Install Add-on From File」装上后重启 Zotero<br>
-        - ❌ <b>PDF 不在 Zotero storage 里</b> → 必须从 Zotero「右键 PDF → 显示文件」拖入 pdf2zh，从 Downloads/桌面拖不会触发同步<br>
-        <br>翻译输出的 PDF 存在 <code>~/Documents/pdf2zh_files/</code> 是<b>默认行为</b>，正确联动时 Zotero 会自己把它拷进 storage 新目录 —— 不需要你手动调路径。</p>
+        - ❌ <b>插件未装/未启用</b> → 下载最新 <a href="https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.9/paperflow-connector-v1.0.19.xpi"><code>paperflow-connector-v1.0.19.xpi</code></a>，Zotero 里「工具 → 附加组件 → ⚙ → Install Add-on From File」装上后重启 Zotero<br>
+        - ❌ <b>PDF 不在 Zotero storage 里</b> → 必须从 Zotero「右键 PDF → 显示文件」拖入 paperflow，从 Downloads/桌面拖不会触发同步<br>
+        <br>翻译输出的 PDF 存在 <code>~/Documents/paperflow_files/</code> 是<b>默认行为</b>，正确联动时 Zotero 会自己把它拷进 storage 新目录 —— 不需要你手动调路径。</p>
       </div>
 
       <div class="card">
         <div class="top"><h5>Zotero 9.0.4+ 提示插件不兼容？</h5></div>
-        <p class="desc">这是旧 v1.0.5 插件的通配符 bug。下载最新 <a href="https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.9/pdf2zh-connector-v1.0.19.xpi"><code>pdf2zh-connector-v1.0.19.xpi</code></a>（1.6 KB）拖进 Zotero「附加组件」重装，兼容整个 Zotero 9.x 系列。<br>Mac/Win 用户<b>用同一份 xpi</b>（Zotero 插件是纯 JavaScript，跨平台）。</p>
+        <p class="desc">这是旧 v1.0.5 插件的通配符 bug。下载最新 <a href="https://github.com/AaronGIG/pdf2zh-desktop/releases/download/v2.3.9/paperflow-connector-v1.0.19.xpi"><code>paperflow-connector-v1.0.19.xpi</code></a>（1.6 KB）拖进 Zotero「附加组件」重装，兼容整个 Zotero 9.x 系列。<br>Mac/Win 用户<b>用同一份 xpi</b>（Zotero 插件是纯 JavaScript，跨平台）。</p>
       </div>
 
       <div class="card">
         <div class="top"><h5>课本、画册、杂志翻译效果不好？</h5></div>
-        <p class="desc">这不是 bug，是 <b>引擎能力边界</b>。pdf2zh 是为「标准学术排版」（单/双栏、规范字体、明确段落）设计的。课本/画册/杂志这类「图文混排重、艺术字体多、文字嵌图」的 PDF，常见现象：<br>
+        <p class="desc">这不是 bug，是 <b>引擎能力边界</b>。paperflow 是为「标准学术排版」（单/双栏、规范字体、明确段落）设计的。课本/画册/杂志这类「图文混排重、艺术字体多、文字嵌图」的 PDF，常见现象：<br>
         ① 译文跟图片错位<br>
         ② 艺术标题被识别成公式跳过<br>
         ③ 多栏跨页错乱<br>
@@ -772,7 +772,7 @@
   </section>
 
   <footer>
-    <p>pdf2zh-desktop · macOS Edition · v2.3.9</p>
+    <p>paperflow-desktop · macOS Edition · v2.3.9</p>
     <p>基于 PDFMathTranslate / MuPDF / PyQt5 ·  <a href="https://github.com/AaronGIG/pdf2zh-desktop">GitHub</a> · 联系作者 QQ: 2994574297@qq.com</p>
     
     <p style="margin-top:6px;font-size:11px;color:#aaa">本教程截图来自实际运行的 v2.3.4 · macOS 14 · 1421×894 窗口 · 截图已脱敏</p>

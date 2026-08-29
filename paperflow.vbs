@@ -8,7 +8,7 @@ Set shell = CreateObject("WScript.Shell")
 shell.CurrentDirectory = appDir
 
 If Not fso.FileExists(pythonw) Then
-    MsgBox "Python not found: " & pythonw & vbCrLf & "Please run install.bat first.", vbCritical, "pdf2zh"
+    MsgBox "Python not found: " & pythonw & vbCrLf & "Please run install.bat first.", vbCritical, "PaperFlow"
     WScript.Quit 1
 End If
 
@@ -27,7 +27,7 @@ If Not vcInstalled Then
         Dim msg
         msg = "Visual C++ not installed." & vbCrLf & "Install it to enable AI layout detection?" & vbCrLf & vbCrLf & "(Requires admin rights)"
         Dim answer
-        answer = MsgBox(msg, vbYesNo + vbQuestion, "pdf2zh")
+        answer = MsgBox(msg, vbYesNo + vbQuestion, "PaperFlow")
         If answer = vbYes Then
             shell.Run Chr(34) & vcRedist & Chr(34) & " /install /passive /norestart", 1, True
         End If

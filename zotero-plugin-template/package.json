@@ -4,11 +4,11 @@
     "version": "1.0.0",
     "description": "Right-click translate PDF with PaperFlow desktop and attach the translated PDF back to the Zotero item (linked file beside the original).",
     "config": {
-        "prefsPrefix": "extensions.zotero.pdf2zh",
+        "prefsPrefix": "extensions.zotero.paperflow",
         "addonID": "paperflow-connector@gw.com",
         "addonName": "PaperFlow Connector for Zotero",
-        "addonInstance": "Pdf2zhConnector",
-        "addonRef": "pdf2zhconnector"
+        "addonInstance": "PaperFlowConnector",
+        "addonRef": "paperflowconnector"
     },
     "repository": {
         "type": "git",

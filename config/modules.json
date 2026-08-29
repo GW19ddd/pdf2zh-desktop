@@ -7,7 +7,7 @@
       "required": true,
       "components": [
         "python_runtime",
-        "pdf2zh_core",
+        "paperflow_core",
         "pyqt5_gui",
         "basic_translators"
       ]

@@ -1,7 +1,7 @@
 import { getString } from "../utils/locale";
 import { prefGet, prefSet } from "../utils/prefs";
 import { debugLog, debugLogPath } from "../utils/debug";
-import { launchPdf2zh, Pdf2zhLaunchInfo } from "./launcher";
+import { launchPaperFlow, PaperFlowLaunchInfo } from "./launcher";
 
 /**
  * 右键菜单：
@@ -10,7 +10,7 @@ import { launchPdf2zh, Pdf2zhLaunchInfo } from "./launcher";
  *     注入同样的子菜单，翻译 reader 当前打开的 PDF
  */
 
-export interface PdfInfo extends Pdf2zhLaunchInfo {
+export interface PdfInfo extends PaperFlowLaunchInfo {
   path: string;
   itemID?: number;
 }
@@ -82,12 +82,12 @@ export async function triggerTranslate(
     if (infos.length === 0) {
       alertUser(
         "PaperFlow Connector",
-        "请先选中一个 PDF 附件或含 PDF 的文献条目\n(pdf2zh-desktop Connector)"
+        "请先选中一个 PDF 附件或含 PDF 的文献条目\n(paperflow-desktop Connector)"
       );
       return;
     }
     for (const info of infos) {
-      await launchPdf2zh(info.path, format, auto, info);
+      await launchPaperFlow(info.path, format, auto, info);
     }
     debugLog("=== triggerTranslate DONE ===");
   } catch (e: any) {
@@ -120,7 +120,7 @@ async function triggerReaderTranslate(reader: any, format: string | null, auto: 
       return;
     }
     debugLog("=== triggerReaderTranslate file=" + p + " format=" + format + " ===");
-    await launchPdf2zh(p, format, auto, {
+    await launchPaperFlow(p, format, auto, {
       key: item.key,
       linkMode: item.attachmentLinkMode,
       itemID: item.id,
@@ -145,7 +145,7 @@ function buildTranslateMenu(doc: Document, onTranslate: TranslateHandler): any {
   const create = (tag: string) =>
     (doc as any).createXULElement ? (doc as any).createXULElement(tag) : doc.createElement(tag);
   const menu = create("menu");
-  menu.id = "pdf2zh-translate-menu";
+  menu.id = "paperflow-translate-menu";
   menu.setAttribute("label", getString("menu-translate-label"));
 
   const subpopup = create("menupopup");
@@ -204,7 +204,7 @@ export function installItemContextMenu(win: Window): void {
     const doc = win.document;
     const menupopup = doc.getElementById("zotero-itemmenu");
     if (!menupopup) return;
-    if (doc.getElementById("pdf2zh-translate-menu")) return;
+    if (doc.getElementById("paperflow-translate-menu")) return;
     const menu = buildTranslateMenu(doc, (fmt, auto) => {
       void triggerTranslate(fmt, auto);
     });
@@ -218,7 +218,7 @@ export function installItemContextMenu(win: Window): void {
 function removeItemContextMenu(win: Window): void {
   try {
     if (!win || !win.document) return;
-    const m = win.document.getElementById("pdf2zh-translate-menu");
+    const m = win.document.getElementById("paperflow-translate-menu");
     if (m && m.parentNode) m.parentNode.removeChild(m);
   } catch (e) {
     /* ignore */
@@ -229,7 +229,7 @@ function removeItemContextMenu(win: Window): void {
  * PDF reader 右键菜单（Zotero 9+）：
  * reader.xhtml 不再有静态的 zotero-reader-context-menu，右键菜单由 reader 动态生成。
  * 插件通过 Zotero.Reader.registerEventListener('createViewContextMenu' / 'createAnnotationContextMenu')
- * 把「用 pdf2zh-desktop 翻译」子菜单追加进菜单项（append 必须同步调用）。
+ * 把「用 paperflow-desktop 翻译」子菜单追加进菜单项（append 必须同步调用）。
  */
 type ReaderMenuEvent = {
   reader: any;

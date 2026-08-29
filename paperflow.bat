@@ -8,7 +8,7 @@ set "SCRIPT=%APP_DIR%_launcher.py"
 
 :: Check Python exists
 if not exist "%PYTHONW%" (
-    echo [pdf2zh] Python not found: %PYTHONW%
+    echo [PaperFlow] Python not found: %PYTHONW%
     echo Please run install.bat first.
     pause
     exit /b 1

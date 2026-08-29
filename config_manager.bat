@@ -1,11 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: pdf2zh 桌面版配置管理器
-title pdf2zh 桌面版 - 配置管理器
+:: PaperFlow 桌面版配置管理器
+title PaperFlow 桌面版 - 配置管理器
 
 echo ================================================================
-echo   pdf2zh 桌面版 - 配置管理器
+echo   PaperFlow 桌面版 - 配置管理器
 echo ================================================================
 echo.
 
@@ -17,7 +17,7 @@ set "MODULES_CONFIG=%CONFIG_DIR%\modules.json"
 :menu
 cls
 echo ================================================================
-echo   pdf2zh 桌面版 - 配置管理器
+echo   PaperFlow 桌面版 - 配置管理器
 echo ================================================================
 echo.
 echo 当前配置状态:
@@ -73,10 +73,10 @@ echo 创建应用配置文件...
 (
 echo {
 echo   "app": {
-echo     "name": "pdf2zh 桌面版",
+echo     "name": "PaperFlow 桌面版",
 echo     "version": "1.9.9",
 echo     "build": "slim",
-echo     "author": "pdf2zh Desktop Contributors"
+echo     "author": "PaperFlow Desktop Contributors"
 echo   },
 echo   "runtime": {
 echo     "python_version": "3.12",
@@ -96,7 +96,7 @@ echo     "config": "./config",
 echo     "plugins": "./plugins",
 echo     "cache": "./cache",
 echo     "assets": "./assets",
-echo     "output": "./pdf2zh_files"
+echo     "output": "./paperflow_files"
 echo   },
 echo   "optimization": {
 echo     "lazy_loading": true,
@@ -264,7 +264,7 @@ echo.
 set /p ie_choice="请选择: "
 
 if "%ie_choice%"=="1" (
-    set "EXPORT_FILE=pdf2zh_config_%date:~0,4%%date:~5,2%%date:~8,2%.zip"
+    set "EXPORT_FILE=paperflow_config_%date:~0,4%%date:~5,2%%date:~8,2%.zip"
     echo 正在导出配置包...
     powershell -command "Compress-Archive -Path '%CONFIG_DIR%\*' -DestinationPath '%EXPORT_FILE%' -Force"
     if exist "%EXPORT_FILE%" (
@@ -292,5 +292,5 @@ pause
 goto menu
 
 :exit
-echo 感谢使用 pdf2zh 桌面版配置管理器！
+echo 感谢使用 PaperFlow 桌面版配置管理器！
 exit /b 0

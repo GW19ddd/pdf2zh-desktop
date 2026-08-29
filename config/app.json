@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "pdf2zh 桌面版",
+    "name": "PaperFlow 桌面版",
     "version": "2.2.4",
     "build": "slim",
     "author": "AaronGIG (gw)"
@@ -41,7 +41,7 @@
     "plugins": "./plugins",
     "cache": "./cache",
     "assets": "./assets",
-    "output": "./pdf2zh_files"
+    "output": "./paperflow_files"
   },
   "optimization": {
     "lazy_loading": true,

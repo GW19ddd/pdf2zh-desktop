@@ -1,11 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: pdf2zh 桌面版系统诊断工具
-title pdf2zh 桌面版 - 系统诊断
+:: PaperFlow 桌面版系统诊断工具
+title PaperFlow 桌面版 - 系统诊断
 
 echo ================================================================
-echo   pdf2zh 桌面版 - 系统诊断工具
+echo   PaperFlow 桌面版 - 系统诊断工具
 echo ================================================================
 echo.
 
@@ -19,7 +19,7 @@ echo.
 :: 开始生成报告
 (
 echo ================================================================
-echo   pdf2zh 桌面版 - 系统诊断报告
+echo   PaperFlow 桌面版 - 系统诊断报告
 echo   生成时间: %date% %time%
 echo ================================================================
 echo.
@@ -82,9 +82,9 @@ echo.
 
 echo [核心模块]
 if exist "core\site-packages\pdf2zh" (
-    echo pdf2zh 库: 已安装
+    echo PaperFlow 翻译引擎: 已安装
 ) else (
-    echo pdf2zh 库: 未安装
+    echo PaperFlow 翻译引擎: 未安装
 )
 
 if exist "core\site-packages\PyQt5" (
@@ -135,7 +135,7 @@ echo.
 
 echo [进程信息]
 tasklist | findstr python.exe
-tasklist | findstr pdf2zh
+tasklist | findstr paperflow
 echo.
 
 echo [最近错误日志]
@@ -179,7 +179,7 @@ if not exist "core\runtime\python.exe" (
 )
 
 if not exist "core\site-packages\pdf2zh" (
-    echo [!] 问题: pdf2zh 库未安装
+    echo [!] 问题: PaperFlow 翻译引擎未安装
     set /a ISSUES_FOUND+=1
 )
 
@@ -215,7 +215,7 @@ if not exist "core\runtime\python.exe" (
     echo - 运行 install.bat 安装核心组件
 )
 if not exist "core\site-packages\pdf2zh" (
-    echo - 运行 module_manager.bat 安装 pdf2zh 库
+    echo - 运行 module_manager.bat 安装 PaperFlow 翻译引擎
 )
 reg query "HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" >nul 2>&1
 if %errorlevel% neq 0 (
@@ -239,5 +239,5 @@ if %errorlevel% == 1 (
 )
 
 echo.
-echo 感谢使用 pdf2zh 桌面版诊断工具！
+echo 感谢使用 PaperFlow 桌面版诊断工具！
 pause

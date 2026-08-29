@@ -1,16 +1,16 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: pdf2zh 桌面版卸载程序
-title pdf2zh 桌面版 - 卸载程序
+:: PaperFlow 桌面版卸载程序
+title PaperFlow 桌面版 - 卸载程序
 
 echo ================================================================
-echo   pdf2zh 桌面版 - 卸载程序
+echo   PaperFlow 桌面版 - 卸载程序
 echo ================================================================
 echo.
 
 :: 警告提示
-echo [警告] 此操作将完全移除 pdf2zh 桌面版及其所有数据
+echo [警告] 此操作将完全移除 PaperFlow 桌面版及其所有数据
 echo.
 echo 将要删除的内容:
 echo   - 程序文件和运行时
@@ -19,10 +19,10 @@ echo   - 缓存文件和临时数据
 echo   - 桌面快捷方式
 echo   - 翻译历史记录
 echo.
-echo [注意] 翻译输出的PDF文件(pdf2zh_files目录)将被保留
+echo [注意] 翻译输出的PDF文件(paperflow_files目录)将被保留
 echo.
 
-choice /c YN /m "确定要卸载 pdf2zh 桌面版吗"
+choice /c YN /m "确定要卸载 PaperFlow 桌面版吗"
 if %errorlevel% == 2 (
     echo 取消卸载
     pause
@@ -35,14 +35,14 @@ echo 开始卸载...
 :: 关闭可能运行的程序
 echo [1/6] 关闭运行中的程序...
 taskkill /f /im python.exe 2>nul
-taskkill /f /im pdf2zh.exe 2>nul
+taskkill /f /im paperflow.exe 2>nul
 timeout /t 2 /nobreak >nul
 
 :: 删除桌面快捷方式
 echo [2/6] 删除桌面快捷方式...
 set "DESKTOP=%USERPROFILE%\Desktop"
-del "%DESKTOP%\pdf2zh 桌面版.lnk" 2>nul
-if exist "%DESKTOP%\pdf2zh 桌面版.lnk" (
+del "%DESKTOP%\PaperFlow 桌面版.lnk" 2>nul
+if exist "%DESKTOP%\PaperFlow 桌面版.lnk" (
     echo [!] 无法删除桌面快捷方式
 ) else (
     echo [✓] 桌面快捷方式已删除
@@ -51,16 +51,16 @@ if exist "%DESKTOP%\pdf2zh 桌面版.lnk" (
 :: 删除开始菜单快捷方式
 echo [3/6] 删除开始菜单快捷方式...
 set "STARTMENU=%APPDATA%\Microsoft\Windows\Start Menu\Programs"
-del "%STARTMENU%\pdf2zh 桌面版.lnk" 2>nul
+del "%STARTMENU%\PaperFlow 桌面版.lnk" 2>nul
 
 :: 备份用户数据
 echo [4/6] 备份用户数据...
-set "BACKUP_DIR=%USERPROFILE%\pdf2zh_backup_%date:~0,4%%date:~5,2%%date:~8,2%"
+set "BACKUP_DIR=%USERPROFILE%\paperflow_backup_%date:~0,4%%date:~5,2%%date:~8,2%"
 mkdir "%BACKUP_DIR%" 2>nul
 
-if exist "pdf2zh_files" (
+if exist "paperflow_files" (
     echo 正在备份翻译文件到: %BACKUP_DIR%
-    xcopy "pdf2zh_files" "%BACKUP_DIR%\pdf2zh_files" /e /i /q 2>nul
+    xcopy "paperflow_files" "%BACKUP_DIR%\paperflow_files" /e /i /q 2>nul
 )
 
 if exist "config\user_config.json" (
@@ -117,11 +117,11 @@ echo   - 快捷方式: 已删除
 echo.
 echo 保留内容:
 echo   - 翻译文件备份: %BACKUP_DIR%
-echo   - 原始pdf2zh_files目录: 已保留
+echo   - 原始paperflow_files目录: 已保留
 echo.
 echo 如需完全清理，请手动删除:
 echo   - %BACKUP_DIR%
-echo   - %INSTALL_DIR%pdf2zh_files
+echo   - %INSTALL_DIR%paperflow_files
 echo.
 
 :: 询问是否删除安装目录
@@ -136,7 +136,7 @@ if %errorlevel% == 1 (
 )
 
 echo.
-echo 感谢使用 pdf2zh 桌面版！
+echo 感谢使用 PaperFlow 桌面版！
 echo 如有问题或建议，欢迎访问项目主页反馈
 pause
 

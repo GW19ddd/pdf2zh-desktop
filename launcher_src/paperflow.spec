@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='pdf2zh',
+    name='paperflow',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,5 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['d:/03-Codes/pdf2zh-desktop/assets/icon.ico'],
+    icon=['d:/03-Codes/pdf2zh-desktop/assets/paperflow.ico'],
 )

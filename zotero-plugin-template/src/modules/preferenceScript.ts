@@ -1,7 +1,7 @@
 import { config } from "../../package.json";
 import { prefGet, prefSet } from "../utils/prefs";
 import { debugLog } from "../utils/debug";
-import { findPdf2zhExecutable } from "./launcher";
+import { findPaperFlowExecutable } from "./launcher";
 
 /**
  * 设置面板逻辑（addon/content/preferences.xhtml 加载时调用）。
@@ -14,11 +14,11 @@ const boundWindows = new WeakSet<Window>();
 export async function registerPrefsScripts(_window: Window): Promise<void> {
   if (boundWindows.has(_window)) return;
   const doc = _window.document;
-  const exe = doc.getElementById("pdf2zh-exepath") as HTMLInputElement;
-  const hint = doc.getElementById("pdf2zh-exehint");
-  const fmt = doc.getElementById("pdf2zh-format") as HTMLSelectElement;
-  const detectBtn = doc.getElementById("pdf2zh-detect");
-  const browseBtn = doc.getElementById("pdf2zh-browse");
+  const exe = doc.getElementById("paperflow-exepath") as HTMLInputElement;
+  const hint = doc.getElementById("paperflow-exehint");
+  const fmt = doc.getElementById("paperflow-format") as HTMLSelectElement;
+  const detectBtn = doc.getElementById("paperflow-detect");
+  const browseBtn = doc.getElementById("paperflow-browse");
   if (!exe || !hint || !fmt) {
     debugLog("prefs pane elements missing, retry later");
     (_window as any).setTimeout(() => {
@@ -72,7 +72,7 @@ export async function registerPrefsScripts(_window: Window): Promise<void> {
   });
 
   function onDetect(): void {
-    const found = findPdf2zhExecutable();
+    const found = findPaperFlowExecutable();
     if (found) {
       setP("exePath", found);
       exe.value = found;
@@ -96,7 +96,7 @@ export async function registerPrefsScripts(_window: Window): Promise<void> {
   // 自动连接：未设置程序路径时自动探测并写入
   const current = exe.value || getP("exePath", "");
   if (!current) {
-    const auto = findPdf2zhExecutable();
+    const auto = findPaperFlowExecutable();
     if (auto) {
       setP("exePath", auto);
       exe.value = auto;
@@ -113,7 +113,7 @@ async function pickExecutable(cb: (path: string) => void): Promise<void> {
     const fp = new FP();
     fp.init(win, "选择 PaperFlow 程序", fp.modeOpen);
     if (Zotero.isWin) {
-      fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
+      fp.appendFilter("paperflow.exe", "paperflow.exe");
       fp.appendFilters(fp.filterApps);
     }
     const rv = await fp.show();

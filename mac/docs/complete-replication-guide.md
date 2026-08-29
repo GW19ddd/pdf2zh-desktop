@@ -1,4 +1,4 @@
-# pdf2zh-desktop Mac v2.2.0 — 完整复刻指南
+# paperflow-desktop Mac v2.2.0 — 完整复刻指南
 
 > 目标：在一台全新 Mac 上，从零完美复刻出与当前版本一模一样的 app
 > 编写日期：2026-04-06
@@ -9,7 +9,7 @@
 ## 一、项目全貌
 
 ### 是什么
-一个 macOS 桌面 PDF 论文翻译工具，基于 PyQt5 + pdf2zh 引擎，开箱即用的 .app。
+一个 macOS 桌面 PDF 论文翻译工具，基于 PyQt5 + paperflow 引擎，开箱即用的 .app。
 
 ### 核心特性
 - 20+ 翻译服务（Google/Bing/DeepSeek/OpenAI/DeepL 等）
@@ -53,7 +53,7 @@ source venv/bin/activate
 # 核心
 pip install PyQt5==5.15.11 pyqt5-sip==12.18.0
 pip install PyMuPDF==1.26.7
-pip install pdf2zh==1.9.9
+__PROTECT_PIP_PAPERFLOW__==1.9.9
 pip install babeldoc==0.2.33
 
 # AI & 翻译服务
@@ -112,12 +112,12 @@ mac/
 │   ├── app_icon.png             # 应用图标
 │   └── pf-radio.png             # 界面素材
 │   ├── doclayout_yolo.onnx      # 布局检测模型 (72MB)
-│   ├── pdf2zh-connector.xpi     # Zotero 插件
+│   ├── paperflow-connector.xpi     # Zotero 插件
 │   ├── zotero-plugin/           # 插件源码
 │   └── zotero-plugin-unpacked/  # 插件未打包版
 │
-├── pdf2zh.spec                  # PyInstaller 打包配置
-├── pdf2zh.command               # Shell 启动脚本
+├── paperflow.spec                  # PyInstaller 打包配置
+├── paperflow.command               # Shell 启动脚本
 └── README.md
 ```
 
@@ -192,7 +192,7 @@ elev = "#3A3A3C"
 def main():
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-    app = Pdf2zhApp(sys.argv); app.setStyle("Fusion")
+    app = PaperFlowApp(sys.argv); app.setStyle("Fusion")
     w = MainWindow(); w.show()
     sys.exit(app.exec_())
 ```
@@ -343,7 +343,7 @@ conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
 ### 6.8 翻译完成通知
 ```python
 subprocess.Popen(["osascript", "-e",
-    f'display notification "{msg}" with title "pdf2zh" sound name "Glass"'])
+    f'display notification "{msg}" with title "PaperFlow" sound name "Glass"'])
 ```
 
 ---
@@ -353,21 +353,21 @@ subprocess.Popen(["osascript", "-e",
 ### 7.1 打包命令
 ```bash
 cd mac/
-python3 -m PyInstaller pdf2zh.spec --noconfirm
+python3 -m PyInstaller paperflow.spec --noconfirm
 ```
 
 ### 7.2 产物
 ```
-dist/pdf2zh.app    # 可直接运行的 macOS 应用
+dist/paperflow.app    # 可直接运行的 macOS 应用
 ```
 
 ### 7.3 分发
 ```bash
 # 压缩
-zip -r pdf2zh-desktop-mac-v2.2.0.zip dist/pdf2zh.app
+zip -r paperflow-desktop-mac-v2.2.0.zip dist/paperflow.app
 
 # 上传到 GitHub Release
-gh release create v2.2.0 pdf2zh-desktop-mac-v2.2.0.zip \
+gh release create v2.2.0 paperflow-desktop-mac-v2.2.0.zip \
     --title "v2.2.0" --notes "更新日志..."
 ```
 
@@ -378,7 +378,7 @@ gh release create v2.2.0 pdf2zh-desktop-mac-v2.2.0.zip \
 | `ModuleNotFoundError: pdf2zh` | hiddenimports 不全 | 在 spec 里加 `collect_all('pdf2zh')` |
 | `onnxruntime` 找不到 | 二进制不兼容 | 确保 pip 安装的是 arm64 版 |
 | `babeldoc` 可选 | 不是所有环境有 | try/except 包裹 collect_all |
-| 启动闪退无报错 | 信号槽异常 | 从终端运行 .app/Contents/MacOS/pdf2zh 看 traceback |
+| 启动闪退无报错 | 信号槽异常 | 从终端运行 .app/Contents/MacOS/paperflow 看 traceback |
 | 字体渲染异常 | `Monospace` 字体缺失 | 忽略警告，不影响功能 |
 
 ---
@@ -392,7 +392,7 @@ gh release create v2.2.0 pdf2zh-desktop-mac-v2.2.0.zip \
 | 术语库 | `~/pdf2zh_glossary.json` | 当前激活的术语库 |
 | 提示词 | `~/pdf2zh_prompts.json` | 用户自定义提示词 |
 | AI prompt 库 | 存在 config 中 `ai_prompt_library` | 快捷操作库 |
-| 输出目录 | `~/Documents/pdf2zh_files/` | 翻译输出 |
+| 输出目录 | `~/Documents/paperflow_files/` | 翻译输出 |
 
 ---
 

@@ -1,5 +1,5 @@
 """
-pdf2zh for Mac — 完整版主窗口
+PaperFlow for Mac — 完整版主窗口
 全功能适配: 三种预览模式 / 分块翻译 / 页码范围 / 历史记录 / 20+翻译服务
 """
 
@@ -12,7 +12,7 @@ from pathlib import Path
 import fitz
 
 
-def _install_pdf2zh_color_fix():
+def _install_paperflow_color_fix():
     """v2.3.3 运行时热补丁 (import hook, 不改 pdf2zh 模块本身):
     修复某些期刊 PDF(ICC 颜色空间) 白色矩形 '1 1 1 scn' 被截断成 '1 scn' → 渲染成红色,
     以及译文文字继承颜色导致变红。在 pdf2zh.pdfinterp / pdf2zh.converter 被导入时自动打补丁。
@@ -625,7 +625,7 @@ def _install_pdf2zh_color_fix():
                 pass
 
 
-_install_pdf2zh_color_fix()
+_install_paperflow_color_fix()
 
 
 def _find_zotero_exe_windows():
@@ -3890,10 +3890,10 @@ class TranslatePage(QWidget):
                     reply = QMessageBox.question(
                         self, "Zotero 联动提示",
                         f"检测到 {len(zotero_sourced)} 个文件来自 Zotero storage 目录，\n"
-                        "但 Zotero 插件（pdf2zh Connector）没响应，翻译完不会自动加到 Zotero 库里。\n\n"
+                        "但 Zotero 插件（PaperFlow Connector）没响应，翻译完不会自动加到 Zotero 库里。\n\n"
                         "可能原因：\n"
                         "  1. Zotero 没打开 → 请打开 Zotero 后重试\n"
-                        "  2. 插件没装 → 在设置页点「一键安装插件」，或从 github releases 下载最新 pdf2zh-connector xpi 手动安装\n"
+                        "  2. 插件没装 → 在设置页点「一键安装插件」，或从 github releases 下载最新 paperflow-connector xpi 手动安装\n"
                         "  3. 插件启动失败 → 到 Zotero「附加组件」检查有没有错误\n\n"
                         "是否仍要继续翻译？（结果会保存在默认目录，不同步到 Zotero）",
                         QMessageBox.Yes | QMessageBox.No,
@@ -3919,7 +3919,7 @@ class TranslatePage(QWidget):
         self.pending_files = files
         self._batch_idx = 0
         self._batch_results = []     # [(file_path, output_files_dict), ...]
-        self._output_dir = os.path.expanduser("~/Documents/pdf2zh_files")
+        self._output_dir = os.path.expanduser("~/Documents/paperflow_files")
         os.makedirs(self._output_dir, exist_ok=True)
 
         self._cancel_pending = False
@@ -4026,7 +4026,7 @@ class TranslatePage(QWidget):
     _TIPS = [
         "翻译中，请稍候…", "公式和图表会完整保留",
         "AI 正在识别文档布局…", "保持网络连接以获得最佳速度",
-        "快好了，再等等…", "pdf2zh-desktop · 学术翻译利器",
+        "快好了，再等等…", "PaperFlow · 学术翻译利器",
         "排版会和原文一模一样", "支持 20+ 翻译引擎",
         "每一篇论文，都是知识跨越语言的桥梁",
         "科研不易，感谢你的坚持",
@@ -4211,7 +4211,7 @@ class TranslatePage(QWidget):
 
             linked = False
             if item_key:
-                _dbg_write(f"    POST /pdf2zh/attach itemKey={item_key} title={title!r} file={src!r} parent={file_path!r}")
+                _dbg_write(f"    POST /paperflow/attach itemKey={item_key} title={title!r} file={src!r} parent={file_path!r}")
                 try:
                     # v1.0.20: 传 parent_file_path(原 PDF 路径), 插件端据此识别原附件是否为链接附件,
                     # 是则译文放到原 PDF 同目录并做成链接附件(跟随 zotmoov 等管理的位置), 否则沿用 imported 逻辑
@@ -4294,13 +4294,13 @@ class TranslatePage(QWidget):
             if has_zotero:
                 self.prog_detail.setText("译文已保存回 Zotero 原位")
             else:
-                self.prog_detail.setText("输出至 ~/Documents/pdf2zh_files")
+                self.prog_detail.setText("输出至 ~/Documents/paperflow_files")
         elif failed == 0:
             self.prog_label.setText(f"全部完成（{ok} 篇）")
             if has_zotero:
                 self.prog_detail.setText("所有译文已保存回 Zotero 原位")
             else:
-                self.prog_detail.setText("输出至 ~/Documents/pdf2zh_files")
+                self.prog_detail.setText("输出至 ~/Documents/paperflow_files")
         else:
             self.prog_label.setText(f"完成 {ok} 篇，失败 {failed} 篇")
             self.prog_detail.setText("部分文件翻译出错")
@@ -4317,7 +4317,7 @@ class TranslatePage(QWidget):
             msg = f"{ok} 篇翻译完成" if failed == 0 else f"完成 {ok} 篇，失败 {failed} 篇"
             subprocess.Popen([
                 "osascript", "-e",
-                f'display notification "{msg}" with title "pdf2zh" sound name "Glass"'
+                f'display notification "{msg}" with title "PaperFlow" sound name "Glass"'
             ])
         except Exception:
             pass
@@ -5674,7 +5674,7 @@ class SettingsPage(QWidget):
     def _export_prompts(self):
         """导出所有模板到 JSON"""
         from ui.prompt_manager import PromptTemplateManager
-        path, _ = QFileDialog.getSaveFileName(self, "导出模板", "pdf2zh_prompts.json", "JSON (*.json)")
+        path, _ = QFileDialog.getSaveFileName(self, "导出模板", "paperflow_prompts.json", "JSON (*.json)")
         if path:
             PromptTemplateManager.export_to_file(path)
 
@@ -5823,9 +5823,9 @@ class SettingsPage(QWidget):
         self._ai_url_input.clear()
 
     def _install_zotero_plugin(self):
-        """一键安装 pdf2zh Connector 到 Zotero"""
+        """一键安装 PaperFlow Connector 到 Zotero"""
         import glob, shutil, subprocess, sys
-        xpi = _res('assets', 'pdf2zh-connector.xpi')
+        xpi = _res('assets', 'paperflow-connector.xpi')
         if not os.path.exists(xpi):
             self._zot_status.setText("插件文件缺失")
             self._zot_status.setStyleSheet("color:#FF3B30;")
@@ -5849,7 +5849,7 @@ class SettingsPage(QWidget):
         # 1. 复制 XPI 到 extensions 目录
         ext_dir = os.path.join(profile, "extensions")
         os.makedirs(ext_dir, exist_ok=True)
-        dst = os.path.join(ext_dir, "pdf2zh-connector@aarongig.com.xpi")
+        dst = os.path.join(ext_dir, "paperflow-connector@gw.com.xpi")
         shutil.copy2(xpi, dst)
         # 2. 设置 autoDisableScopes=0 允许 profile 级别的扩展自动加载
         # v2.3.2 (对齐 issue #26 修复): 改 prefs.js 前先备份 + 出错时 rollback,
@@ -5860,7 +5860,7 @@ class SettingsPage(QWidget):
         ext_json_path = os.path.join(profile, "extensions.json")
         if os.path.exists(ext_json_path):
             try:
-                shutil.copy2(ext_json_path, ext_json_path + ".pdf2zh-backup")
+                shutil.copy2(ext_json_path, ext_json_path + ".paperflow-backup")
             except Exception:
                 pass
         try:
@@ -5868,7 +5868,7 @@ class SettingsPage(QWidget):
             if 'autoDisableScopes' not in prefs_content:
                 # 先备份再改
                 try:
-                    shutil.copy2(prefs_path, prefs_path + ".pdf2zh-backup")
+                    shutil.copy2(prefs_path, prefs_path + ".paperflow-backup")
                 except Exception:
                     pass
                 with open(prefs_path, 'a', encoding='utf-8') as f:
@@ -5883,7 +5883,7 @@ class SettingsPage(QWidget):
         # 询问是否重启 Zotero
         reply = QMessageBox.question(
             self, "安装成功",
-            "pdf2zh Connector 已部署到 Zotero，重启 Zotero 后生效。\n\n现在重启 Zotero？",
+            "PaperFlow Connector 已部署到 Zotero，重启 Zotero 后生效。\n\n现在重启 Zotero？",
             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes
         )
         if reply == QMessageBox.Yes:
@@ -5908,7 +5908,7 @@ class SettingsPage(QWidget):
             self._zot_status.setStyleSheet("color:#0071E3;")
 
     def _check_zotero_plugin(self):
-        """检测 pdf2zh Connector 插件状态"""
+        """检测 PaperFlow Connector 插件状态"""
         if zotero_plugin_installed():
             self._zot_status.setText("已安装")
             self._zot_status.setStyleSheet("color:#34C759;font-weight:600;")
@@ -6033,7 +6033,7 @@ class AboutPage(QWidget):
         ti = _EggLogo("📄", 22)
         ti.setFixedSize(32, 32); ti.setAlignment(Qt.AlignCenter)
         top.addWidget(ti)
-        tn = QPushButton("pdf2zh-desktop"); tn.setObjectName("SBLink")
+        tn = QPushButton("PaperFlow"); tn.setObjectName("SBLink")
         tn.setStyleSheet("font-size:18px;font-weight:700;padding:0;text-align:left;")
         tn.setCursor(Qt.PointingHandCursor); tn.setFlat(True)
         tn.clicked.connect(lambda: webbrowser.open("https://github.com/AaronGIG/pdf2zh-desktop"))
@@ -6366,13 +6366,13 @@ class MainWindow(QMainWindow):
         self.sidebar = sb
         sbl = QVBoxLayout(sb); sbl.setContentsMargins(16,24,16,16); sbl.setSpacing(4)
 
-        # Logo: pdf2zh/desktop — 📄 彩蛋 + 可点击标题
+        # Logo: PaperFlow — 📄 彩蛋 + 可点击标题
         logo_row = QHBoxLayout(); logo_row.setSpacing(10); logo_row.setContentsMargins(4,0,0,0)
         logo_icon = _EggLogo("📄", 28)
         logo_icon.setFixedSize(36, 36); logo_icon.setAlignment(Qt.AlignCenter)
         logo_row.addWidget(logo_icon)
         logo_text = QVBoxLayout(); logo_text.setSpacing(0)
-        logo_name = QPushButton("pdf2zh-desktop"); logo_name.setObjectName("SBLink")
+        logo_name = QPushButton("PaperFlow"); logo_name.setObjectName("SBLink")
         logo_name.setStyleSheet("font-size:15px;font-weight:700;letter-spacing:-0.2px;padding:0;text-align:left;")
         logo_name.setCursor(Qt.PointingHandCursor); logo_name.setFlat(True)
         logo_name.clicked.connect(lambda: webbrowser.open("https://github.com/AaronGIG/pdf2zh-desktop"))
@@ -6704,12 +6704,12 @@ class MainWindow(QMainWindow):
 
 
 def _dbg_write(msg):
-    """v2.3.2 debug: 写到 /tmp/pdf2zh-cli-debug.log + stderr，双保险"""
+    """v2.3.2 debug: 写到 /tmp/paperflow-cli-debug.log + stderr，双保险"""
     try:
         from datetime import datetime as _dt
         line = f"[{_dt.now().strftime('%H:%M:%S.%f')[:-3]}] {msg}\n"
         try:
-            fd = os.open("/tmp/pdf2zh-cli-debug.log", os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o644)
+            fd = os.open("/tmp/paperflow-cli-debug.log", os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o644)
             os.write(fd, line.encode("utf-8", errors="replace"))
             os.close(fd)
         except Exception:
@@ -6724,11 +6724,11 @@ def _dbg_write(msg):
 
 
 def _parse_cli_args(argv):
-    """解析命令行参数 (向后兼容 — 老 pdf2zh xxx.pdf 依然工作)
+    """解析命令行参数 (向后兼容 — 老 paperflow xxx.pdf 依然工作)
     支持:
-      pdf2zh file.pdf                    ← 旧行为
-      pdf2zh --format=side_by_side --auto file.pdf   ← 新行为（Zotero 右键唤起）
-      pdf2zh --format=dual file.pdf
+      paperflow file.pdf                    ← 旧行为
+      paperflow --format=side_by_side --auto file.pdf   ← 新行为（Zotero 右键唤起）
+      paperflow --format=dual file.pdf
     返回 dict: {file: str|None, format: str|None, auto: bool}
     """
     result = {"file": None, "format": None, "auto": False, "silent": False, "tables": None}
@@ -6753,22 +6753,22 @@ def _parse_cli_args(argv):
     return result
 
 
-class Pdf2zhApp(QApplication):
+class PaperFlowApp(QApplication):
     """单实例 QApplication：第二个实例把文件+参数发给第一个实例后退出"""
     file_opened = pyqtSignal(dict)  # {file, format, auto}
-    _SERVER_NAME = "com.aarongig.pdf2zh.single"
+    _SERVER_NAME = "com.paperflow.desktop.single"
 
     def __init__(self, argv):
         # v2.3.2: 最早的 debug log 用 sys.stderr + /tmp 双保险
-        _dbg_write(f"Pdf2zhApp.__init__ START argv[{len(argv)}]={argv!r}")
+        _dbg_write(f"PaperFlowApp.__init__ START argv[{len(argv)}]={argv!r}")
         super().__init__(argv)
-        _dbg_write("Pdf2zhApp.__init__ super() done")
+        _dbg_write("PaperFlowApp.__init__ super() done")
         from PyQt5.QtNetwork import QLocalServer, QLocalSocket
         self._pending_file = None
 
         # 解析命令行参数
         cli = _parse_cli_args(argv)
-        _dbg_write(f"Pdf2zhApp.__init__ cli parsed = {cli!r}")
+        _dbg_write(f"PaperFlowApp.__init__ cli parsed = {cli!r}")
 
         # 尝试连接已有实例
         sock = QLocalSocket()
@@ -6815,7 +6815,7 @@ class Pdf2zhApp(QApplication):
         # v2.3.2 修 bug: FileOpen event 收到路径时，之前 emit(str) 与 signal dict 定义不匹配 → 静默丢失
         if e.type() == e.FileOpen:
             path = e.file()
-            _dbg_write(f"Pdf2zhApp.event FileOpen path={path!r}")
+            _dbg_write(f"PaperFlowApp.event FileOpen path={path!r}")
             if path and path.lower().endswith('.pdf'):
                 # 用 CLI 里保存的 format/auto 参数（如果启动时带了）
                 cli = getattr(self, '_launch_cli', {}) or {}
@@ -6834,9 +6834,9 @@ def main():
     _dbg_write("main() entered")
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-    _dbg_write("main() creating Pdf2zhApp")
-    app = Pdf2zhApp(sys.argv); app.setStyle("Fusion")
-    _dbg_write("main() Pdf2zhApp created, creating MainWindow")
+    _dbg_write("main() creating PaperFlowApp")
+    app = PaperFlowApp(sys.argv); app.setStyle("Fusion")
+    _dbg_write("main() PaperFlowApp created, creating MainWindow")
     try:
         w = MainWindow()
         _dbg_write(f"main() MainWindow created type={type(w).__name__}")
@@ -6940,7 +6940,7 @@ def _early_log(tag):
     try:
         import os as _os, sys as _sys, time as _time
         line = f"[{_time.strftime('%H:%M:%S')}] {tag} name={__name__!r} argv={_sys.argv!r}\n"
-        fd = _os.open("/tmp/pdf2zh-early.log", _os.O_WRONLY | _os.O_APPEND | _os.O_CREAT, 0o644)
+        fd = _os.open("/tmp/paperflow-early.log", _os.O_WRONLY | _os.O_APPEND | _os.O_CREAT, 0o644)
         _os.write(fd, line.encode("utf-8", errors="replace"))
         _os.close(fd)
         try:

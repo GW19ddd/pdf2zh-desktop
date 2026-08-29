@@ -2,11 +2,11 @@
 chcp 65001>nul 2>&1
 setlocal enabledelayedexpansion
 
-:: pdf2zh 翻译工具 - 安装配置脚本
-title pdf2zh 翻译工具 - 安装配置
+:: PaperFlow 翻译工具 - 安装配置脚本
+title PaperFlow 翻译工具 - 安装配置
 
 echo ================================================================
-echo   pdf2zh 翻译工具 v2.3.19 - 安装配置脚本
+echo   PaperFlow 翻译工具 v2.3.19 - 安装配置脚本
 echo   PDF 翻译工作台（桌面版）
 echo ================================================================
 echo.
@@ -65,7 +65,7 @@ if %errorlevel% == 0 (
 :: 创建运行所需目录
 echo.
 echo [3/6] 创建运行目录...
-mkdir "%INSTALL_DIR%pdf2zh_files" 2>nul
+mkdir "%INSTALL_DIR%paperflow_files" 2>nul
 mkdir "%INSTALL_DIR%logs" 2>nul
 echo [OK] 运行目录已就绪
 
@@ -94,14 +94,14 @@ if exist "%INSTALL_DIR%core\site-packages\pdf2zh\gui_pyqt5.py" (
 :: 创建桌面快捷方式
 echo.
 echo [6/6] 创建桌面快捷方式...
-set "SHORTCUT_NAME=pdf2zh 翻译工具.lnk"
+set "SHORTCUT_NAME=PaperFlow 翻译工具.lnk"
 
-powershell -NoProfile -Command "try { $ws = New-Object -ComObject WScript.Shell; $desktop = [Environment]::GetFolderPath('Desktop'); $lnk = Join-Path $desktop $env:SHORTCUT_NAME; $s = $ws.CreateShortcut($lnk); $s.TargetPath = Join-Path $env:INSTALL_DIR 'pdf2zh.bat'; $s.WorkingDirectory = $env:INSTALL_DIR; $s.Description = 'pdf2zh 翻译工具 - PDF 翻译工作台'; $s.Save(); if (Test-Path $lnk) { Write-Host 'shortcut created'; exit 0 } else { exit 1 } } catch { Write-Host $_.Exception.Message; exit 1 }"
+powershell -NoProfile -Command "try { $ws = New-Object -ComObject WScript.Shell; $desktop = [Environment]::GetFolderPath('Desktop'); $lnk = Join-Path $desktop $env:SHORTCUT_NAME; $s = $ws.CreateShortcut($lnk); $s.TargetPath = Join-Path $env:INSTALL_DIR 'paperflow.bat'; $s.WorkingDirectory = $env:INSTALL_DIR; $s.Description = 'PaperFlow 翻译工具 - PDF 翻译工作台'; $s.Save(); if (Test-Path $lnk) { Write-Host 'shortcut created'; exit 0 } else { exit 1 } } catch { Write-Host $_.Exception.Message; exit 1 }"
 
 if %errorlevel% == 0 (
     echo [OK] 桌面快捷方式已创建
 ) else (
-    echo [!] 桌面快捷方式创建失败，可直接双击运行 pdf2zh.bat
+    echo [!] 桌面快捷方式创建失败，可直接双击运行 paperflow.bat
 )
 
 :: 安装完成提示
@@ -112,13 +112,13 @@ echo ================================================================
 echo.
 echo 安装信息:
 echo   - 安装目录: %INSTALL_DIR%
-echo   - 启动方式: 双击桌面快捷方式 或 运行 pdf2zh.bat
-echo   - 输出目录: pdf2zh_files\
+echo   - 启动方式: 双击桌面快捷方式 或 运行 paperflow.bat
+echo   - 输出目录: paperflow_files\
 echo.
 echo 使用说明:
-echo   1. 双击桌面快捷方式启动 pdf2zh 翻译工具
+echo   1. 双击桌面快捷方式启动 PaperFlow 翻译工具
 echo   2. 选择 PDF 文件并设置翻译选项
-echo   3. 翻译完成后自动保存到 pdf2zh_files 目录
+echo   3. 翻译完成后自动保存到 paperflow_files 目录
 echo   4. 支持 Zotero 联动翻译，可在设置页启用
 echo.
 echo 项目地址:
@@ -126,11 +126,11 @@ echo   - 主页: https://github.com/GW19ddd/pdf2zh-desktop
 echo   - 反馈: https://github.com/GW19ddd/pdf2zh-desktop/issues
 echo.
 
-choice /c YN /m "是否立即启动 pdf2zh 翻译工具?"
+choice /c YN /m "是否立即启动 PaperFlow 翻译工具?"
 if %errorlevel% == 1 (
     echo 正在启动...
-    start "" "%INSTALL_DIR%pdf2zh.bat"
+    start "" "%INSTALL_DIR%paperflow.bat"
 )
 
-echo 安装配置完成，感谢使用 pdf2zh 翻译工具
+echo 安装配置完成，感谢使用 PaperFlow 翻译工具
 pause

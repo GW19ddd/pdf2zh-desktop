@@ -1,10 +1,10 @@
 /*
- * pdf2zh Connector for Zotero  v1.0.18
+ * PaperFlow Connector for Zotero  v1.0.18
  *
  * 功能：
- *   1. HTTP 端点 /pdf2zh/attach — 接收 pdf2zh 翻译结果作为子附件（原有回写机制，一行不动）
- *   2. HTTP 端点 /pdf2zh/ping   — 健康检查（一行不动）
- *   3. NEW: 右键菜单「用 pdf2zh 翻译」— 唤起本地 pdf2zh app 翻译选中 PDF
+ *   1. HTTP 端点 /paperflow/attach — 接收 paperflow 翻译结果作为子附件（原有回写机制，一行不动）
+ *   2. HTTP 端点 /paperflow/ping   — 健康检查（一行不动）
+ *   3. NEW: 右键菜单「用 paperflow 翻译」— 唤起本地 paperflow app 翻译选中 PDF
  *
  * 兼容 Zotero 7 / 8 / 9（strict_min_version 6.999, strict_max_version 9.*）
  */
@@ -22,7 +22,7 @@ function _makeAttachEndpoint() {
 
         init: async function (options) {
             try {
-                _dbgLog('=== /pdf2zh/attach POST received ===');
+                _dbgLog('=== /paperflow/attach POST received ===');
                 var data = typeof options.data === 'string' ? JSON.parse(options.data) : options.data;
                 var itemKey = data.itemKey;
                 var filePath = data.filePath;
@@ -63,13 +63,13 @@ function _makeAttachEndpoint() {
                     _dbgLog('  title override saved');
                 }
 
-                _dbgLog('  === /pdf2zh/attach DONE ok ===');
+                _dbgLog('  === /paperflow/attach DONE ok ===');
                 return [200, 'application/json', JSON.stringify({
                     key: attachment.key,
                     id: attachment.id
                 })];
             } catch (e) {
-                _dbgLog('  ✗ /pdf2zh/attach EXCEPTION: ' + e + ' stack=' + (e && e.stack ? e.stack : 'no-stack'));
+                _dbgLog('  ✗ /paperflow/attach EXCEPTION: ' + e + ' stack=' + (e && e.stack ? e.stack : 'no-stack'));
                 return [500, 'application/json', JSON.stringify({
                     error: String(e)
                 })];
@@ -89,7 +89,7 @@ function _makePingEndpoint() {
         init: async function (req) {
             return [200, 'application/json', JSON.stringify({
                 status: 'ok',
-                plugin: 'pdf2zh-desktop-connector',
+                plugin: 'paperflow-desktop-connector',
                 version: '1.0.18'
             })];
         }
@@ -97,7 +97,7 @@ function _makePingEndpoint() {
     return PingEndpoint;
 }
 
-// ============ NEW: 右键菜单唤起 pdf2zh ============
+// ============ NEW: 右键菜单唤起 paperflow ============
 
 // v1.0.18: Zotero 9 (Firefox 128+) 移除了 OS 全局。用 PathUtils / nsIEnvironment 三层 fallback。
 function _homeDir() {
@@ -116,10 +116,10 @@ function _pathJoin(a, b) {
     return a + sep + b;
 }
 
-// v1.0.18: 用户手动配置的路径 (Zotero pref)。找不到时可让用户设置 extensions.pdf2zh.exePath
+// v1.0.18: 用户手动配置的路径 (Zotero pref)。找不到时可让用户设置 extensions.zotero.paperflow.exePath
 function _getSavedExePath() {
     try {
-        var p = Zotero.Prefs.get('extensions.pdf2zh.exePath', true);
+        var p = Zotero.Prefs.get('extensions.zotero.paperflow.exePath', true);
         if (p && Zotero.File.pathToFile(p).exists()) return p;
     } catch (e) {}
     return null;
@@ -134,24 +134,24 @@ function _fileExists(path) {
 
 // v1.0.18: 后台静默翻译开关 (存 Zotero pref, 右键菜单可切换)
 function _isSilentMode() {
-    try { return Zotero.Prefs.get('extensions.pdf2zh.silent', true) === true; } catch (e) { return false; }
+    try { return Zotero.Prefs.get('extensions.zotero.paperflow.silent', true) === true; } catch (e) { return false; }
 }
 function _toggleSilentMode() {
     var now = !_isSilentMode();
-    try { Zotero.Prefs.set('extensions.pdf2zh.silent', now, true); } catch (e) {}
+    try { Zotero.Prefs.set('extensions.zotero.paperflow.silent', now, true); } catch (e) {}
     return now;
 }
 
-// 在某目录下浅层扫描 pdf2zh.exe (v1.0.18 增强):
+// 在某目录下浅层扫描 paperflow.exe (v1.0.18 增强):
 // 遍历每个子目录(含 D:\31376 这种自定义中间文件夹), 查子目录内是否有
-// pdf2zh.exe 或 pdf2zh-desktop-win\pdf2zh.exe。限制数量避免全盘慢扫。
+// paperflow.exe 或 paperflow-desktop-win\paperflow.exe。限制数量避免全盘慢扫。
 function _scanDirForExe(dir, exeName) {
     try {
         var d = Zotero.File.pathToFile(dir);
         if (!d || !d.exists() || !d.isDirectory()) return null;
         var direct = _fileExists(_pathJoin(dir, exeName));
         if (direct) return direct;
-        var winRoot = _fileExists(_pathJoin(_pathJoin(dir, 'pdf2zh-desktop-win'), exeName));
+        var winRoot = _fileExists(_pathJoin(_pathJoin(dir, 'paperflow-desktop-win'), exeName));
         if (winRoot) return winRoot;
         var skip = {'windows': 1, '$recycle.bin': 1, 'system volume information': 1,
                     'programdata': 1, 'recovery': 1, 'perflogs': 1, 'appdata': 1};
@@ -165,19 +165,19 @@ function _scanDirForExe(dir, exeName) {
             count++;
             var name = (sub.leafName || '').toLowerCase();
             if (skip[name]) continue;
-            // 任意中间文件夹下: <sub>\pdf2zh.exe
+            // 任意中间文件夹下: <sub>\paperflow.exe
             var hit = _fileExists(_pathJoin(sub.path, exeName));
             if (hit) return hit;
-            // <sub>\pdf2zh-desktop-win\pdf2zh.exe  (处理 D:\31376\pdf2zh-desktop-win\)
-            var hit2 = _fileExists(_pathJoin(_pathJoin(sub.path, 'pdf2zh-desktop-win'), exeName));
+            // <sub>\paperflow-desktop-win\paperflow.exe  (处理 D:\31376\paperflow-desktop-win\)
+            var hit2 = _fileExists(_pathJoin(_pathJoin(sub.path, 'paperflow-desktop-win'), exeName));
             if (hit2) return hit2;
         }
     } catch (e) {}
     return null;
 }
 
-// 找 pdf2zh 可执行文件（跨平台）— v1.0.18 大幅增强搜索
-function _findPdf2zhExecutable() {
+// 找 paperflow 可执行文件（跨平台）— v1.0.18 大幅增强搜索
+function _findPaperFlowExecutable() {
     var home = _homeDir();
 
     // 0) 用户手动配置优先
@@ -185,22 +185,22 @@ function _findPdf2zhExecutable() {
     if (saved) return saved;
 
     if (Zotero.isMac) {
-        var macs = ['/Applications/pdf2zh.app', _pathJoin(home, 'Applications/pdf2zh.app')];
+        var macs = ['/Applications/paperflow.app', _pathJoin(home, 'Applications/paperflow.app')];
         for (var i = 0; i < macs.length; i++) { if (_fileExists(macs[i])) return macs[i]; }
         return null;
     }
 
     if (!Zotero.isWin) {
-        var lins = ['/usr/local/bin/pdf2zh', _pathJoin(home, 'pdf2zh-desktop-win/pdf2zh')];
+        var lins = ['/usr/local/bin/paperflow', _pathJoin(home, 'paperflow-desktop-win/paperflow')];
         for (var j = 0; j < lins.length; j++) { if (_fileExists(lins[j])) return lins[j]; }
         return null;
     }
 
     // ===== Windows =====
-    var exe = 'pdf2zh.exe';
-    var folderNames = ['pdf2zh-desktop-win', 'pdf2zh-desktop-win-v2.3.3', 'pdf2zh-desktop-win-v2.3.2',
-                       'pdf2zh-desktop-win-v2.3.1', 'pdf2zh'];
-    // 1) 固定候选: <base>\<folderName>\pdf2zh.exe  和  <base>\pdf2zh.exe
+    var exe = 'paperflow.exe';
+    var folderNames = ['paperflow-desktop-win', 'paperflow-desktop-win-v2.3.3', 'paperflow-desktop-win-v2.3.2',
+                       'paperflow-desktop-win-v2.3.1', 'paperflow'];
+    // 1) 固定候选: <base>\<folderName>\paperflow.exe  和  <base>\paperflow.exe
     var bases = [
         'C:\\', 'C:\\Program Files', 'C:\\Program Files (x86)',
         _pathJoin(home, 'Downloads'), _pathJoin(home, 'Desktop'),
@@ -211,8 +211,8 @@ function _findPdf2zhExecutable() {
         for (var fn = 0; fn < folderNames.length; fn++) {
             var p = _fileExists(_pathJoin(_pathJoin(bases[b], folderNames[fn]), exe));
             if (p) return p;
-            // 嵌套一层: <base>\<folderName>\pdf2zh-desktop-win\pdf2zh.exe
-            var p2 = _fileExists(_pathJoin(_pathJoin(_pathJoin(bases[b], folderNames[fn]), 'pdf2zh-desktop-win'), exe));
+            // 嵌套一层: <base>\<folderName>\paperflow-desktop-win\paperflow.exe
+            var p2 = _fileExists(_pathJoin(_pathJoin(_pathJoin(bases[b], folderNames[fn]), 'paperflow-desktop-win'), exe));
             if (p2) return p2;
         }
         var direct = _fileExists(_pathJoin(bases[b], exe));
@@ -228,14 +228,14 @@ function _findPdf2zhExecutable() {
     return null;
 }
 
-// v1.0.18: 日志到 /tmp/pdf2zh-xpi-debug.log 便于用户复制粘贴排查
+// v1.0.18: 日志到 /tmp/paperflow-xpi-debug.log 便于用户复制粘贴排查
 function _dbgLog(msg) {
     try {
         var line = '[' + (new Date()).toISOString() + '] ' + msg + '\n';
-        Zotero.debug('pdf2zh-xpi: ' + msg);
+        Zotero.debug('paperflow-xpi: ' + msg);
         // 走 IOUtils（Zotero 9+）→ OS.File（老版本）
         try {
-            IOUtils.write('/tmp/pdf2zh-xpi-debug.log',
+            IOUtils.write('/tmp/paperflow-xpi-debug.log',
                 new TextEncoder().encode(line),
                 { mode: 'appendOrCreate' });
         } catch (e1) { /* IOUtils 不可用则算了，Zotero.debug 已经写了 */ }
@@ -255,38 +255,38 @@ function _loadSubprocess() {
     }
 }
 
-// 唤起 pdf2zh app + 传参
-async function _launchPdf2zh(filePath, format, auto) {
-    var exe = _findPdf2zhExecutable();
+// 唤起 paperflow app + 传参
+async function _launchPaperFlow(filePath, format, auto) {
+    var exe = _findPaperFlowExecutable();
     if (!exe) {
-        // v1.0.18: 找不到时让用户手动指定 pdf2zh.exe / pdf2zh.app 路径, 存进 pref 永久生效
+        // v1.0.18: 找不到时让用户手动指定 paperflow.exe / paperflow.app 路径, 存进 pref 永久生效
         var picked = null;
         try {
             var win = Zotero.getMainWindow();
-            var yes = Services.prompt.confirm(win, 'pdf2zh-desktop Connector',
-                '没有自动找到 pdf2zh-desktop 应用。\n\n' +
-                'Windows: 请确认已把 pdf2zh-desktop-win 文件夹解压出来(里面有 pdf2zh.exe)。\n' +
-                'Mac: 确认 pdf2zh.app 在“应用程序”里。\n\n' +
-                '点“确定”手动选择 ' + (Zotero.isWin ? 'pdf2zh.exe' : 'pdf2zh.app') + ' 的位置(只需选一次)；\n' +
+            var yes = Services.prompt.confirm(win, 'PaperFlow Connector for Zotero',
+                '没有自动找到 paperflow-desktop 应用。\n\n' +
+                'Windows: 请确认已把 paperflow-desktop-win 文件夹解压出来(里面有 paperflow.exe)。\n' +
+                'Mac: 确认 paperflow.app 在“应用程序”里。\n\n' +
+                '点“确定”手动选择 ' + (Zotero.isWin ? 'paperflow.exe' : 'paperflow.app') + ' 的位置(只需选一次)；\n' +
                 '点“取消”去下载：github.com/AaronGIG/pdf2zh-desktop/releases');
             if (yes) {
                 var fp = Components.classes['@mozilla.org/filepicker;1'].createInstance(Components.interfaces.nsIFilePicker);
-                fp.init(win, '选择 pdf2zh 程序', fp.modeOpen);
-                if (Zotero.isWin) { fp.appendFilter('pdf2zh.exe', 'pdf2zh.exe'); fp.appendFilters(fp.filterApps); }
+                fp.init(win, '选择 paperflow 程序', fp.modeOpen);
+                if (Zotero.isWin) { fp.appendFilter('paperflow.exe', 'paperflow.exe'); fp.appendFilters(fp.filterApps); }
                 var rv = fp.show ? fp.show() : fp.open;
                 if (rv === fp.returnOK && fp.file) {
                     picked = fp.file.path;
-                    try { Zotero.Prefs.set('extensions.pdf2zh.exePath', picked, true); } catch (e) {}
+                    try { Zotero.Prefs.set('extensions.zotero.paperflow.exePath', picked, true); } catch (e) {}
                 }
             }
         } catch (e) { /* 老版本 Zotero 无 filepicker 时降级 */ }
         if (picked) {
             exe = picked;
         } else {
-            Zotero.alert(null, 'pdf2zh-desktop Connector',
-                '未找到 pdf2zh-desktop 应用。\n' +
-                'Windows: 把下载的 zip 解压, 确认有 pdf2zh-desktop-win\\pdf2zh.exe；建议解压到“下载”或“桌面”。\n' +
-                'Mac: 把 pdf2zh.app 放进“应用程序”。\n\n' +
+            Zotero.alert(null, 'PaperFlow Connector for Zotero',
+                '未找到 paperflow-desktop 应用。\n' +
+                'Windows: 把下载的 zip 解压, 确认有 paperflow-desktop-win\\paperflow.exe；建议解压到“下载”或“桌面”。\n' +
+                'Mac: 把 paperflow.app 放进“应用程序”。\n\n' +
                 '下载：https://github.com/AaronGIG/pdf2zh-desktop/releases');
             return;
         }
@@ -295,7 +295,7 @@ async function _launchPdf2zh(filePath, format, auto) {
     var args = [];
     if (format) args.push('--format=' + format);
     if (auto) args.push('--auto');
-    // v1.0.18: 后台静默模式(用户在右键菜单里开启, 存 pref) —— 传 --silent 给 pdf2zh
+    // v1.0.18: 后台静默模式(用户在右键菜单里开启, 存 pref) —— 传 --silent 给 paperflow
     if (_isSilentMode()) args.push('--silent');
     args.push(filePath);
 
@@ -305,10 +305,10 @@ async function _launchPdf2zh(filePath, format, auto) {
         command = '/usr/bin/open';
         allArgs = ['-a', exe, '--args'].concat(args);
     } else if (Zotero.isWin) {
-        // v1.0.18 关键修复: pdf2zh.exe / pdf2zh.vbs 都不转发命令行参数给 _launcher.py,
+        // v1.0.18 关键修复: paperflow.exe / paperflow.vbs 都不转发命令行参数给 _launcher.py,
         // 导致 Zotero 右键唤起后不自动翻译。改成直接跑 core\runtime\pythonw.exe _launcher.py <args>
         // (Subprocess 走 CreateProcessW, 中文路径 Unicode 安全) + 复刻 vbs 的环境变量。
-        var appDir = exe.replace(/[\\\/]+pdf2zh\.exe$/i, '');
+        var appDir = exe.replace(/[\\\/]+paperflow\.exe$/i, '');
         var pythonw = appDir + '\\core\\runtime\\pythonw.exe';
         var launcher = appDir + '\\_launcher.py';
         if (_fileExists(pythonw) && _fileExists(launcher)) {
@@ -364,10 +364,10 @@ async function _launchPdf2zh(filePath, format, auto) {
         _dbgLog('nsIProcess.run SUCCESS');
     } catch (e) {
         _dbgLog('nsIProcess FAILED: ' + e);
-        Zotero.alert(null, 'pdf2zh-desktop Connector',
-            '唤起 pdf2zh-desktop 失败：\n' + String(e) + '\n\n' +
-            '临时办法：手动打开 pdf2zh-desktop 应用，把 PDF 拖进去。\n' +
-            '日志已写到 /tmp/pdf2zh-xpi-debug.log');
+        Zotero.alert(null, 'PaperFlow Connector for Zotero',
+            '唤起 paperflow-desktop 失败：\n' + String(e) + '\n\n' +
+            '临时办法：手动打开 paperflow-desktop 应用，把 PDF 拖进去。\n' +
+            '日志已写到 /tmp/paperflow-xpi-debug.log');
     }
 }
 
@@ -408,17 +408,17 @@ async function _triggerTranslate(format, auto) {
         var paths = await _getSelectedPdfPaths();
         _dbgLog('selected pdf paths count=' + paths.length + ' paths=' + JSON.stringify(paths));
         if (paths.length === 0) {
-            Zotero.alert(null, 'pdf2zh-desktop Connector', '请先选中一个 PDF 附件或含 PDF 的文献条目\n(pdf2zh-desktop Connector)');
+            Zotero.alert(null, 'PaperFlow Connector for Zotero', '请先选中一个 PDF 附件或含 PDF 的文献条目\n(PaperFlow Connector for Zotero)');
             return;
         }
         for (var i = 0; i < paths.length; i++) {
-            await _launchPdf2zh(paths[i], format, auto);
+            await _launchPaperFlow(paths[i], format, auto);
         }
         _dbgLog('=== _triggerTranslate DONE ===');
     } catch (e) {
         _dbgLog('_triggerTranslate EXCEPTION: ' + e + ' stack=' + (e && e.stack ? e.stack : 'no-stack'));
-        Zotero.alert(null, 'pdf2zh-desktop Connector',
-            '右键翻译失败：\n' + String(e) + '\n\n日志已写到 /tmp/pdf2zh-xpi-debug.log');
+        Zotero.alert(null, 'PaperFlow Connector for Zotero',
+            '右键翻译失败：\n' + String(e) + '\n\n日志已写到 /tmp/paperflow-xpi-debug.log');
     }
 }
 
@@ -430,12 +430,12 @@ function _installContextMenu(window) {
     if (!menupopup) return;
 
     // 避免重复安装
-    if (doc.getElementById('pdf2zh-translate-menu')) return;
+    if (doc.getElementById('paperflow-translate-menu')) return;
 
     // 主菜单项
     var menu = doc.createXULElement ? doc.createXULElement('menu') : doc.createElement('menu');
-    menu.id = 'pdf2zh-translate-menu';
-    menu.setAttribute('label', '📖 用 pdf2zh-desktop 翻译');
+    menu.id = 'paperflow-translate-menu';
+    menu.setAttribute('label', '📖 用 paperflow-desktop 翻译');
 
     var subpopup = doc.createXULElement ? doc.createXULElement('menupopup') : doc.createElement('menupopup');
 
@@ -449,7 +449,7 @@ function _installContextMenu(window) {
         { label: '─────────', separator: true },
         { label: '后台静默翻译（不弹窗，完成自动关闭）', silentToggle: true },
         { label: '─────────', separator: true },
-        { label: '⚙️ 打开 pdf2zh-desktop 手动配置', format: null, auto: false }
+        { label: '⚙️ 打开 paperflow-desktop 手动配置', format: null, auto: false }
     ];
 
     var _silentCheckItem = null;
@@ -491,7 +491,7 @@ function _installContextMenu(window) {
 
 function _removeContextMenu(window) {
     if (!window || !window.document) return;
-    var m = window.document.getElementById('pdf2zh-translate-menu');
+    var m = window.document.getElementById('paperflow-translate-menu');
     if (m && m.parentNode) m.parentNode.removeChild(m);
 }
 
@@ -544,20 +544,20 @@ function _unregisterWindowListener() {
 
 function startup() {
     // 1. 注册 HTTP 端点（回写机制 — 一行不动）
-    Zotero.Server.Endpoints['/pdf2zh/attach'] = _makeAttachEndpoint();
-    Zotero.Server.Endpoints['/pdf2zh/ping'] = _makePingEndpoint();
+    Zotero.Server.Endpoints['/paperflow/attach'] = _makeAttachEndpoint();
+    Zotero.Server.Endpoints['/paperflow/ping'] = _makePingEndpoint();
 
     // 2. NEW: 注册右键菜单（新功能，独立 try 避免影响回写）
     try {
         _registerWindowListener();
     } catch (e) {
-        Zotero.debug('pdf2zh: 右键菜单注册失败（HTTP 端点仍工作）: ' + e);
+        Zotero.debug('paperflow: 右键菜单注册失败（HTTP 端点仍工作）: ' + e);
     }
 }
 
 function shutdown() {
-    delete Zotero.Server.Endpoints['/pdf2zh/attach'];
-    delete Zotero.Server.Endpoints['/pdf2zh/ping'];
+    delete Zotero.Server.Endpoints['/paperflow/attach'];
+    delete Zotero.Server.Endpoints['/paperflow/ping'];
     try { _unregisterWindowListener(); } catch (e) { /* ignore */ }
 }
 

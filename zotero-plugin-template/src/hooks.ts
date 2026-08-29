@@ -54,7 +54,7 @@ async function registerPrefsPane() {
     // 不 await 的话失败会被吞掉，日志里看不到真实原因
     const paneID = await Zotero.PreferencePanes.register({
       pluginID: addon.data.config.addonID,
-      id: "pdf2zh-pref-pane",
+      id: "paperflow-pref-pane",
       src: `chrome://${addon.data.config.addonRef}/content/preferences.xhtml`,
       label: getString("prefs-title"),
       image: `chrome://${addon.data.config.addonRef}/content/icons/favicon.png`,

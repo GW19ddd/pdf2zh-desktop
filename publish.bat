@@ -3,7 +3,7 @@ chcp 65001>nul 2>&1
 setlocal enabledelayedexpansion
 
 REM ==========================================================
-REM  pdf2zh-desktop 一键打包发布脚本
+REM  PaperFlow 一键打包发布脚本
 REM  用法:
 REM    publish.bat              -> 同步代码 + 打包 + 上传到最新 tag 的 Release
 REM    publish.bat 2.3.20       -> 指定版本号（tag 须为 v2.3.20）
@@ -12,7 +12,7 @@ REM  前置条件: 已安装 GitHub CLI (gh) 并登录
 REM ==========================================================
 
 set "REPO=%~dp0"
-set "TARGET=%USERPROFILE%\Desktop\pdf2zh-desktop-win"
+set "TARGET=%USERPROFILE%\Desktop\paperflow-desktop-win"
 set "RELEASE_DIR=%REPO%.release"
 set "UPLOAD=1"
 
@@ -28,10 +28,10 @@ if "%VER%"=="" (
 if "%VER%"=="" set "VER=2.3.19"
 set "VER=%VER:v=%"
 set "TAG=v%VER%"
-set "ZIP=%RELEASE_DIR%\pdf2zh-desktop-win-v%VER%.zip"
+set "ZIP=%RELEASE_DIR%\paperflow-desktop-win-v%VER%.zip"
 
 echo ============================================
-echo  pdf2zh-desktop 发布工具  v%VER%
+echo  PaperFlow 发布工具  v%VER%
 echo ============================================
 
 REM ---- 0. 校验 ----
@@ -46,7 +46,7 @@ robocopy "%REPO%core\site-packages\pdf2zh" "%TARGET%core\site-packages\pdf2zh" /
 if %errorlevel% GEQ 8 (echo [错误] 同步 pdf2zh 代码失败 && pause && exit /b 1)
 copy /Y "%REPO%_launcher.py" "%TARGET%_launcher.py" >nul
 copy /Y "%REPO%install.bat" "%TARGET%install.bat" >nul
-copy /Y "%REPO%pdf2zh.bat" "%TARGET%pdf2zh.bat" >nul
+copy /Y "%REPO%paperflow.bat" "%TARGET%paperflow.bat" >nul
 copy /Y "%REPO%README.md" "%TARGET%README.md" >nul
 copy /Y "%REPO%README_EN.md" "%TARGET%README_EN.md" >nul
 copy /Y "%REPO%updates.json" "%TARGET%updates.json" >nul
@@ -55,14 +55,14 @@ echo        完成
 REM ---- 2. 打包 zip ----
 echo [2/4] 打包 zip（首次约 1-2 分钟）...
 if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
-if not exist "%RELEASE_DIR%\pdf2zh-desktop-win-v%VER%" (
-    mklink /J "%RELEASE_DIR%\pdf2zh-desktop-win-v%VER%" "%TARGET%" >nul || (echo [错误] 创建 junction 失败 && pause && exit /b 1)
+if not exist "%RELEASE_DIR%\paperflow-desktop-win-v%VER%" (
+    mklink /J "%RELEASE_DIR%\paperflow-desktop-win-v%VER%" "%TARGET%" >nul || (echo [错误] 创建 junction 失败 && pause && exit /b 1)
 )
 if exist "%ZIP%" del /Q "%ZIP%"
 tar -a -c -f "%ZIP%" ^
-    --exclude="logs" --exclude="pdf2zh_files" --exclude="__pycache__" ^
+    --exclude="logs" --exclude="paperflow_files" --exclude="__pycache__" ^
     --exclude="*.pyc" --exclude="*.sqlite" --exclude="*.db" --exclude=".vs" ^
-    -C "%RELEASE_DIR%" pdf2zh-desktop-win-v%VER%
+    -C "%RELEASE_DIR%" paperflow-desktop-win-v%VER%
 if errorlevel 1 (echo [错误] 打包失败 && pause && exit /b 1)
 echo        完成: %ZIP%
 

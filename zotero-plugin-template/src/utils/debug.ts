@@ -1,5 +1,5 @@
 /**
- * 调试日志：写入 Zotero profile 目录下的 pdf2zh-xpi-debug.log
+ * 调试日志：写入 Zotero profile 目录下的 paperflow-xpi-debug.log
  * （同时输出到 Zotero.debug）。Windows 下不用 /tmp（父目录不存在会静默失败）。
  */
 export function debugLogPath(): string {
@@ -13,18 +13,18 @@ export function debugLogPath(): string {
       base = dir.path;
     }
     if (base) {
-      return base + (Zotero.isWin ? "\\pdf2zh-xpi-debug.log" : "/pdf2zh-xpi-debug.log");
+      return base + (Zotero.isWin ? "\\paperflow-xpi-debug.log" : "/paperflow-xpi-debug.log");
     }
   } catch (e) {
     /* ignore */
   }
-  return "pdf2zh-xpi-debug.log";
+  return "paperflow-xpi-debug.log";
 }
 
 export function debugLog(msg: string): void {
   try {
     const line = "[" + new Date().toISOString() + "] " + msg + "\n";
-    Zotero.debug("pdf2zh-xpi: " + msg);
+    Zotero.debug("paperflow-xpi: " + msg);
     try {
       const g = globalThis as any;
       const encoder = g.TextEncoder ? new g.TextEncoder() : null;

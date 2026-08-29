@@ -11,7 +11,7 @@
 
 ### 用户使用流程
 ```
-从 Zotero 拖论文到 pdf2zh → 翻译 → 译文自动保存回 Zotero 原位
+从 Zotero 拖论文到 paperflow → 翻译 → 译文自动保存回 Zotero 原位
 ```
 
 ### 核心原则
@@ -20,7 +20,7 @@
 | **自动识别** | app 自动检测文件是否来自 Zotero，不需要用户手动切换模式 |
 | **不存两份** | Zotero 来源的 PDF，译文只放回原位，可选是否保留 app 输出目录的副本 |
 | **格式可选** | 用户在设置页选择放回哪些格式（dual / mono / side_by_side），支持任意组合 |
-| **插件增强** | 可选安装 Zotero 插件 `pdf2zh Connector`，实现译文自动关联为 Zotero 附件 |
+| **插件增强** | 可选安装 Zotero 插件 `PaperFlow Connector`，实现译文自动关联为 Zotero 附件 |
 
 ---
 
@@ -60,12 +60,12 @@
 │  _resolve_zotero_path(...)       ← 路径拼接             │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
-│              assets/pdf2zh-connector.xpi                 │
+│              assets/paperflow-connector.xpi                 │
 │                                                         │
 │  v1.0.30 构建产物（源码在 zotero-plugin-template/）      │
 │    右键菜单 + 设置面板 + HTTP 端点                       │
-│    POST /pdf2zh/attach  ← 导入/链接译文附件              │
-│    GET  /pdf2zh/ping    ← 健康检查                       │
+│    POST /paperflow/attach  ← 导入/链接译文附件              │
+│    GET  /paperflow/ping    ← 健康检查                       │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -186,7 +186,7 @@ def _zotero_writeback(self, file_path, output_files):
                     os.remove(src)
                 except OSError:
                     pass
-        # 尝试通过 pdf2zh Connector 插件自动关联附件
+        # 尝试通过 PaperFlow Connector 插件自动关联附件
         if item_key:
             mode_label = {"side_by_side": "并排", "dual": "双语", "mono": "译文"}.get(mode, mode)
             zotero_auto_link(item_key, dst, f"翻译 ({mode_label})")
@@ -213,7 +213,7 @@ for attempt in range(3):
 
 ```python
 def zotero_auto_link(item_key, file_path, title):
-    """通过 pdf2zh-connector 插件将译文自动添加为 Zotero 附件"""
+    """通过 paperflow-connector 插件将译文自动添加为 Zotero 附件"""
     import urllib.request
     import json
     payload = json.dumps({
@@ -222,7 +222,7 @@ def zotero_auto_link(item_key, file_path, title):
         "title": title
     }).encode("utf-8")
     req = urllib.request.Request(
-        "http://127.0.0.1:23119/pdf2zh/attach",
+        "http://127.0.0.1:23119/paperflow/attach",
         data=payload,
         headers={"Content-Type": "application/json"},
         method="POST"
@@ -310,40 +310,40 @@ self._zot_keep_copy = QCheckBox("同时保留输出目录副本")  # 默认勾�
 
 ---
 
-## 四、Zotero 插件（zotero-plugin-template/ → assets/pdf2zh-connector.xpi）
+## 四、Zotero 插件（zotero-plugin-template/ → assets/paperflow-connector.xpi）
 
 这个插件是**可选的**，不装也能用基本功能（文件回写）。安装后增加“自动关联附件 + 右键直接翻译”能力。
 
 ### 文件结构（v1.0.30 起）
 ```
 zotero-plugin-template/          # 插件源码（TypeScript，zotero-plugin-scaffold 构建）
-├─ src/modules/httpEndpoints.ts  # POST /pdf2zh/attach + GET /pdf2zh/ping
+├─ src/modules/httpEndpoints.ts  # POST /paperflow/attach + GET /paperflow/ping
 ├─ src/modules/menus.ts          # 条目树 / PDF 阅读器右键菜单
-├─ src/modules/prefs.ts          # 插件设置面板（Zotero → 设置 → pdf2zh 翻译）
+├─ src/modules/prefs.ts          # 插件设置面板（Zotero → 设置 → paperflow 翻译）
 └─ ...                           
-assets/pdf2zh-connector.xpi      # 构建产物（v1.0.0），随 app 一起分发
+assets/paperflow-connector.xpi      # 构建产物（v1.0.0），随 app 一起分发
 ```
 
 ### 插件做了什么
-1. `POST /pdf2zh/attach` — 接收 `{itemKey, filePath, title, parentFilePath}`：
+1. `POST /paperflow/attach` — 接收 `{itemKey, filePath, title, parentFilePath}`：
    - 按 `itemKey` 找到原附件，读取 `attachmentLinkMode`
    - 普通附件（`linkMode=0`）→ `importFromFile` 导入 storage
    - **链接附件**（`linkMode=2`，zotmoov / 手动移动过、不在 storage 里）→ `linkFromFile` 放到原 PDF 同目录
-2. `GET /pdf2zh/ping` — 健康检查，返回 `{"status": "ok"}`
+2. `GET /paperflow/ping` — 健康检查，返回 `{"status": "ok"}`
 
 ### 安装方式
 - 桌面端设置页 → Zotero 联动 → 「一键安装 Zotero 插件」，或
-- Zotero → 工具 → 附加组件 → 齿轮 → 从文件安装插件 → 选择 `assets/pdf2zh-connector.xpi`，重启 Zotero
+- Zotero → 工具 → 附加组件 → 齿轮 → 从文件安装插件 → 选择 `assets/paperflow-connector.xpi`，重启 Zotero
 
 **Win 版不需要改插件代码**：插件由 `zotero-plugin-template/` 构建后随 app 分发。
-构建命令：`cd zotero-plugin-template && npm run build`，产物在 `.scaffold/build/pdf2zh-connector-vX.Y.Z.xpi`。
+构建命令：`cd zotero-plugin-template && npm run build`，产物在 `.scaffold/build/paperflow-connector-vX.Y.Z.xpi`。
 
 ---
 
 ## 五、踩过的坑 & 经验总结
 
 ### 坑 1：macOS 跨进程 MIME 丢失（Win 不受影响）
-macOS 的安全沙箱会剥离非标准 MIME type。从 Zotero 拖条目到 pdf2zh 时，`zotero/item` MIME 为空，只有 `text/plain` 可用。Mac 版不得不写了 `resolve_zotero_by_title()` 做标题模糊匹配。
+macOS 的安全沙箱会剥离非标准 MIME type。从 Zotero 拖条目到 paperflow 时，`zotero/item` MIME 为空，只有 `text/plain` 可用。Mac 版不得不写了 `resolve_zotero_by_title()` 做标题模糊匹配。
 
 **Win 版：不需要这个 hack。** Windows OLE 拖拽支持自定义 MIME 跨进程传递。但建议还是保留 file URL 作为 fallback。
 
@@ -451,7 +451,7 @@ Phase 3（插件联动，~0.5天）
 - [ ] 取消勾选"保留副本" → 翻译后 app 输出目录无副本
 - [ ] 拖非 Zotero 的 PDF → 不显示提示条，走正常流程
 - [ ] Zotero 未运行时翻译 → 文件回写正常（不依赖插件）
-- [ ] 安装 pdf2zh Connector 插件 → 译文自动关联为 Zotero 附件
+- [ ] 安装 PaperFlow Connector 插件 → 译文自动关联为 Zotero 附件
 - [ ] 快速连续拖入多个文件 → 不闪退，批量翻译 + 批量回写
 
 ---
@@ -474,7 +474,7 @@ Mac 版中与 Zotero 相关的所有文件和代码位置：
 | `ui/main_window.py` | `TranslatePage._check_zotero_source()` (L3010) | 提示条控制 |
 | `ui/main_window.py` | `TranslatePage._zotero_writeback()` (L3197) | 回写核心 |
 | `ui/main_window.py` | `SettingsPage` (~L4230) | Zotero 设置卡片 |
-| `assets/pdf2zh-connector.xpi` | — | Zotero 插件构建产物（v1.0.0） |
+| `assets/paperflow-connector.xpi` | — | Zotero 插件构建产物（v1.0.0） |
 | `zotero-plugin-template/src/` | — | Zotero 插件源码（TypeScript） |
 
 > 行号基于 2026-04-06 的 Mac 版代码，可能随后续更新变化。建议用函数名搜索定位。

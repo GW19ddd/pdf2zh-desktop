@@ -1,6 +1,6 @@
 """
 用项目自带的 Python + PyInstaller 打包一个极简启动器 exe
-生成的 pdf2zh.exe 只有一个功能：调用同目录的 core/runtime/pythonw.exe _launcher.py
+生成的 paperflow.exe 只有一个功能：调用同目录的 core/runtime/pythonw.exe _launcher.py
 """
 import subprocess
 import sys
@@ -8,7 +8,7 @@ import os
 
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PYTHON = os.path.join(APP_DIR, "core", "runtime", "python.exe")
-ICON = os.path.join(APP_DIR, "assets", "icon.ico")
+ICON = os.path.join(APP_DIR, "assets", "paperflow.ico")
 
 # 极简启动器脚本
 LAUNCHER_SCRIPT = os.path.join(APP_DIR, "launcher_src", "_stub.py")
@@ -24,7 +24,7 @@ if not os.path.exists(pythonw):
     import ctypes
     ctypes.windll.user32.MessageBoxW(0,
         "找不到 Python 运行时：core\\\\runtime\\\\pythonw.exe\\n\\n请确保完整解压了压缩包。",
-        "pdf2zh 桌面版", 0x10)
+        "PaperFlow 桌面版", 0x10)
     sys.exit(1)
 
 env = os.environ.copy()
@@ -48,7 +48,7 @@ cmd = [
     PYTHON, "-m", "PyInstaller",
     "--onefile",
     "--windowed",
-    "--name", "pdf2zh",
+    "--name", "paperflow",
     "--icon", ICON,
     "--distpath", APP_DIR,
     "--workpath", os.path.join(APP_DIR, "launcher_src", "build"),
@@ -57,4 +57,4 @@ cmd = [
 ]
 print(f"Running: {' '.join(cmd)}")
 subprocess.run(cmd, check=True)
-print(f"\nDone! pdf2zh.exe created at: {APP_DIR}")
+print(f"\nDone! paperflow.exe created at: {APP_DIR}")

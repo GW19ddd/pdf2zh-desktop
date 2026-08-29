@@ -1,6 +1,6 @@
 # Zotero 联动功能 — Windows 手工测试指引
 
-> 适用版本：pdf2zh-desktop Windows 版（v2.3.x）
+> 适用版本：paperflow-desktop Windows 版（v2.3.x）
 > 测试依据：`docs/zotero-integration-guide-for-win.md` 第八节「测试验证清单」
 > 使用方法：按序执行下列测试项，每项填写结果与备注，全部完成即验收。
 
@@ -14,15 +14,15 @@
 - 确认 PDF 被存进 Zotero 数据目录：`<数据目录>\storage\<8位key>\xxx.pdf`
 - 记下该 `<8位key>`（如 `KSII2GGN`），后续测试会用到
 
-### 2. 确认 pdf2zh 版本
-- 启动 pdf2zh，底部「关于」页确认版本号 ≥ v2.3.7
+### 2. 确认 paperflow 版本
+- 启动 paperflow，底部「关于」页确认版本号 ≥ v2.3.7
 
 ### 3. 准备翻译服务
 - 设置页配置可用的翻译服务（Google / DeepL / 其他），确保能正常翻译
 
 ### 4. 可选：安装 Zotero 插件（测试第 8 项需要）
-- 方式 A：pdf2zh 设置页 → Zotero 联动 →「一键安装 Zotero 插件」
-- 方式 B：Zotero → 工具 → 附加组件 → 齿轮 → 从文件安装插件 → 选择 `assets/pdf2zh-connector.xpi`，重启 Zotero
+- 方式 A：paperflow 设置页 → Zotero 联动 →「一键安装 Zotero 插件」
+- 方式 B：Zotero → 工具 → 附加组件 → 齿轮 → 从文件安装插件 → 选择 `assets/paperflow-connector.xpi`，重启 Zotero
 
 > 记录：Zotero 数据目录位置：________；测试 PDF 的 8 位 key：________
 
@@ -35,7 +35,7 @@
 
 | 步骤 | 操作 |
 |---|---|
-| 1 | 从资源管理器（Explorer）把该 PDF **直接拖入** pdf2zh 翻译页 |
+| 1 | 从资源管理器（Explorer）把该 PDF **直接拖入** paperflow 翻译页 |
 | 2 | 观察文件列表上方是否出现蓝色提示条「📚 Zotero 文献 · 译文自动保存回原位」 |
 
 **预期：** 出现提示条 ✔ / 未出现 ✘
@@ -77,7 +77,7 @@
 |---|---|
 | 1 | 设置页 → Zotero 联动：取消勾选「保留本地副本」 |
 | 2 | 再拖入一个 Zotero PDF 翻译 |
-| 3 | 检查默认输出目录（`~/Documents/pdf2zh_files`）与 Zotero 原目录 |
+| 3 | 检查默认输出目录（`~/Documents/paperflow_files`）与 Zotero 原目录 |
 
 **预期：** Zotero 原目录有译文、输出目录无该译文副本 ✔ / 不符 ✘
 **备注：** ________________________________
@@ -107,7 +107,7 @@
 ## 二、插件联动测试（需插件）
 
 ### 测试 8：安装插件 → 译文自动关联为 Zotero 附件
-**前置：** 已按准备步骤 4 安装 `pdf2zh Connector` 插件，Zotero 正在运行
+**前置：** 已按准备步骤 4 安装 `PaperFlow Connector` 插件，Zotero 正在运行
 
 | 步骤 | 操作 |
 |---|---|
@@ -120,7 +120,7 @@
 ### 测试 8b：拖拽条目（MIME 解析，增强功能）
 | 步骤 | 操作 |
 |---|---|
-| 1 | 直接从 Zotero 窗口**拖条目**（不是拖文件）到 pdf2zh 翻译页 |
+| 1 | 直接从 Zotero 窗口**拖条目**（不是拖文件）到 paperflow 翻译页 |
 | 2 | 观察是否自动解析出 PDF |
 
 **预期：** 自动识别条目下的 PDF 加入翻译列表（zotero/item MIME 生效）；若失败，回退为拖文件方式即可 ✔ / 不符 ✘
@@ -134,7 +134,7 @@
 | 步骤 | 操作 |
 |---|---|
 | 1 | 准备 3~5 个 Zotero PDF（不同条目） |
-| 2 | **快速连续**拖入 pdf2zh（尽量在 1 秒内完成） |
+| 2 | **快速连续**拖入 paperflow（尽量在 1 秒内完成） |
 | 3 | 点击翻译，等待全部完成 |
 
 **预期：** 不闪退、不崩溃；全部翻译成功且译文都回写/关联到各自原条目 ✔ / 异常 ✘

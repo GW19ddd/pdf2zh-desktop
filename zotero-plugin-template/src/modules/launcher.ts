@@ -2,15 +2,15 @@ import { prefGet, prefSet } from "../utils/prefs";
 import { debugLog, debugLogPath } from "../utils/debug";
 
 /**
- * 唤起 pdf2zh-desktop 应用（与旧版插件 v1.0.27 行为一致）：
+ * 唤起 paperflow-desktop 应用（与旧版插件 v1.0.27 行为一致）：
  *   - Windows：直接跑 core\runtime\pythonw.exe _launcher.py <args>
- *     （pdf2zh.exe / pdf2zh.vbs 都不转发命令行参数，这是当年"右键不自动翻译"的根因）
+ *     （paperflow.exe / paperflow.vbs 都不转发命令行参数，这是当年"右键不自动翻译"的根因）
  *   - macOS：/usr/bin/open -a <app> --args <args>
  *   - Linux：直接执行可执行文件
  * 参数：--format / --auto / --silent / --zotero-key / --zotero-link-mode <file.pdf>
  */
 
-export interface Pdf2zhLaunchInfo {
+export interface PaperFlowLaunchInfo {
   key?: string;
   itemID?: number;
   linkMode?: number;
@@ -38,14 +38,14 @@ function fileExistsPath(p: string): string | null {
   }
 }
 
-/** 在某目录下浅层扫描 pdf2zh.exe：遍历每个子目录，查子目录内是否有可执行文件。限制数量避免全盘慢扫。 */
+/** 在某目录下浅层扫描 paperflow.exe：遍历每个子目录，查子目录内是否有可执行文件。限制数量避免全盘慢扫。 */
 function scanDirForExe(dir: string, exeName: string): string | null {
   try {
     const d = Zotero.File.pathToFile(dir);
     if (!d || !d.exists() || !d.isDirectory()) return null;
     const direct = fileExistsPath(pathJoin(dir, exeName));
     if (direct) return direct;
-    const winRoot = fileExistsPath(pathJoin(pathJoin(dir, "pdf2zh-desktop-win"), exeName));
+    const winRoot = fileExistsPath(pathJoin(pathJoin(dir, "paperflow-desktop-win"), exeName));
     if (winRoot) return winRoot;
     const skip = new Set([
       "windows",
@@ -71,7 +71,7 @@ function scanDirForExe(dir: string, exeName: string): string | null {
       if (skip.has(name)) continue;
       const hit = fileExistsPath(pathJoin(sub.path, exeName));
       if (hit) return hit;
-      const hit2 = fileExistsPath(pathJoin(pathJoin(sub.path, "pdf2zh-desktop-win"), exeName));
+      const hit2 = fileExistsPath(pathJoin(pathJoin(sub.path, "paperflow-desktop-win"), exeName));
       if (hit2) return hit2;
     }
   } catch (e) {
@@ -80,15 +80,15 @@ function scanDirForExe(dir: string, exeName: string): string | null {
   return null;
 }
 
-/** 找 pdf2zh 可执行文件（跨平台）。手动配置优先，其次固定候选，最后浅递归扫描。 */
-export function findPdf2zhExecutable(): string | null {
+/** 找 paperflow 可执行文件（跨平台）。手动配置优先，其次固定候选，最后浅递归扫描。 */
+export function findPaperFlowExecutable(): string | null {
   const saved = prefGet("exePath", "");
   if (saved && fileExistsPath(saved)) return saved;
 
   const home = homeDir();
 
   if (Zotero.isMac) {
-    const macs = ["/Applications/pdf2zh.app", pathJoin(home, "Applications/pdf2zh.app")];
+    const macs = ["/Applications/paperflow.app", pathJoin(home, "Applications/paperflow.app")];
     for (const m of macs) {
       const f = fileExistsPath(m);
       if (f) return f;
@@ -97,7 +97,7 @@ export function findPdf2zhExecutable(): string | null {
   }
 
   if (!Zotero.isWin) {
-    const lins = ["/usr/local/bin/pdf2zh", pathJoin(home, "pdf2zh-desktop-win/pdf2zh")];
+    const lins = ["/usr/local/bin/paperflow", pathJoin(home, "paperflow-desktop-win/paperflow")];
     for (const p of lins) {
       const f = fileExistsPath(p);
       if (f) return f;
@@ -106,13 +106,13 @@ export function findPdf2zhExecutable(): string | null {
   }
 
   // ===== Windows =====
-  const exe = "pdf2zh.exe";
+  const exe = "paperflow.exe";
   const folderNames = [
-    "pdf2zh-desktop-win",
-    "pdf2zh-desktop-win-v2.3.3",
-    "pdf2zh-desktop-win-v2.3.2",
-    "pdf2zh-desktop-win-v2.3.1",
-    "pdf2zh",
+    "paperflow-desktop-win",
+    "paperflow-desktop-win-v2.3.3",
+    "paperflow-desktop-win-v2.3.2",
+    "paperflow-desktop-win-v2.3.1",
+    "paperflow",
   ];
   const bases = [
     "C:\\",
@@ -131,7 +131,7 @@ export function findPdf2zhExecutable(): string | null {
     for (const fn of folderNames) {
       const p = fileExistsPath(pathJoin(pathJoin(b, fn), exe));
       if (p) return p;
-      const p2 = fileExistsPath(pathJoin(pathJoin(pathJoin(b, fn), "pdf2zh-desktop-win"), exe));
+      const p2 = fileExistsPath(pathJoin(pathJoin(pathJoin(b, fn), "paperflow-desktop-win"), exe));
       if (p2) return p2;
     }
     const direct = fileExistsPath(pathJoin(b, exe));
@@ -183,10 +183,10 @@ function promptPickExecutable(): Promise<string | null> {
         const yes = Services.prompt.confirm(win as any,
           "PaperFlow Connector",
           "没有自动找到 PaperFlow 应用。\n\n" +
-            "Windows: 请确认已把应用文件夹解压出来(里面有 pdf2zh.exe)。\n" +
+            "Windows: 请确认已把应用文件夹解压出来(里面有 paperflow.exe)。\n" +
             "Mac: 确认应用在“应用程序”里。\n\n" +
             "点“确定”手动选择 " +
-            (Zotero.isWin ? "pdf2zh.exe" : "pdf2zh.app") +
+            (Zotero.isWin ? "paperflow.exe" : "paperflow.app") +
             " 的位置(只需选一次)；\n" +
             "点“取消”去下载：github.com/AaronGIG/pdf2zh-desktop/releases"
         );
@@ -196,7 +196,7 @@ function promptPickExecutable(): Promise<string | null> {
           const fp = new FP();
           fp.init(win, "选择 PaperFlow 程序", fp.modeOpen);
           if (Zotero.isWin) {
-            fp.appendFilter("pdf2zh.exe", "pdf2zh.exe");
+            fp.appendFilter("paperflow.exe", "paperflow.exe");
             fp.appendFilters(fp.filterApps);
           }
           const rv = await fp.show();
@@ -216,7 +216,7 @@ function promptPickExecutable(): Promise<string | null> {
         alertUser(
           "PaperFlow Connector",
           "未找到 PaperFlow 应用。\n" +
-            "Windows: 把下载的 zip 解压, 确认有应用文件夹（内含 pdf2zh.exe）；建议解压到“下载”或“桌面”。\n" +
+            "Windows: 把下载的 zip 解压, 确认有应用文件夹（内含 paperflow.exe）；建议解压到“下载”或“桌面”。\n" +
             "Mac: 把应用放进“应用程序”。\n\n" +
             "下载：https://github.com/AaronGIG/pdf2zh-desktop/releases"
         );
@@ -225,13 +225,13 @@ function promptPickExecutable(): Promise<string | null> {
     })();
   });
 }
-export async function launchPdf2zh(
+export async function launchPaperFlow(
   filePath: string,
   format: string | null,
   auto: boolean,
-  info?: Pdf2zhLaunchInfo
+  info?: PaperFlowLaunchInfo
 ): Promise<void> {
-  let exe = findPdf2zhExecutable();
+  let exe = findPaperFlowExecutable();
   if (!exe) {
     exe = await promptPickExecutable();
   }
@@ -257,7 +257,7 @@ export async function launchPdf2zh(
     allArgs = ["-a", exe, "--args"].concat(args);
   } else if (Zotero.isWin) {
     // 直跑 pythonw _launcher.py（CreateProcessW，中文路径 Unicode 安全）+ 复刻 vbs 的环境变量
-    const appDir = exe.replace(/[\\\/]+pdf2zh\.exe$/i, "");
+    const appDir = exe.replace(/[\\\/]+paperflow\.exe$/i, "");
     const pythonw = appDir + "\\core\\runtime\\pythonw.exe";
     const launcher = appDir + "\\_launcher.py";
     if (fileExistsPath(pythonw) && fileExistsPath(launcher)) {

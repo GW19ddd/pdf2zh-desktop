@@ -219,8 +219,8 @@ def _local_opener():
 def zotero_auto_link(item_key: str, file_path: str, title: str,
                      parent_file_path: str = None):
     """
-    通过 pdf2zh-connector 插件将译文自动添加为 Zotero 附件。
-    端点: POST http://127.0.0.1:23119/pdf2zh/attach
+    通过 paperflow-connector 插件将译文自动添加为 Zotero 附件。
+    端点: POST http://127.0.0.1:23119/paperflow/attach
     parent_file_path: v1.0.20 原 PDF 路径。链接附件(zotmoov 等移动过、不在 storage 里)场景下,
                       插件据此判断原附件 linkMode, 译文会放到原 PDF 同目录并做成链接附件。
     返回 (success: bool, message: str)
@@ -242,7 +242,7 @@ def zotero_auto_link(item_key: str, file_path: str, title: str,
     }, ensure_ascii=False).encode("utf-8")
     try:
         req = urllib.request.Request(
-            "http://127.0.0.1:23119/pdf2zh/attach",
+            "http://127.0.0.1:23119/paperflow/attach",
             data=payload,
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -258,7 +258,7 @@ def zotero_auto_link(item_key: str, file_path: str, title: str,
         if e.code == 404:
             return False, "❌ Zotero 联动失败：插件未装或未启用 → 请下载最新 xpi 手动装"
         if e.code == 502:
-            return False, "❌ Zotero 联动失败：HTTP 502 (代理拦截了 loopback 请求；已修，请重启 pdf2zh)"
+            return False, "❌ Zotero 联动失败：HTTP 502 (代理拦截了 loopback 请求；已修，请重启 PaperFlow)"
         return False, f"❌ Zotero 联动失败：HTTP {e.code} {e.reason}"
     except urllib.error.URLError as e:
         return False, "❌ Zotero 联动失败：Zotero 未打开 → 请打开 Zotero 后重新翻译"
@@ -267,10 +267,10 @@ def zotero_auto_link(item_key: str, file_path: str, title: str,
 
 
 def zotero_plugin_installed():
-    """检测 pdf2zh-connector 插件是否已安装"""
+    """检测 paperflow-connector 插件是否已安装"""
     import urllib.request
     try:
-        req = urllib.request.Request("http://127.0.0.1:23119/pdf2zh/ping")
+        req = urllib.request.Request("http://127.0.0.1:23119/paperflow/ping")
         # v2.3.2: 绕过系统代理
         with _local_opener().open(req, timeout=3) as resp:
             return resp.status == 200

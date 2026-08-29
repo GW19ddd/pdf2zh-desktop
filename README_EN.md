@@ -66,7 +66,7 @@ Tired of wrestling with Python environments just to translate a paper? Done with
 ## 🚀 Three Steps to Get Started
 
 1. 📥 **[Download the latest Release](https://github.com/GW19ddd/pdf2zh-desktop/releases/latest)** (zip file, ready to use)
-2. 🖱️ **Double-click `pdf2zh.bat`** to launch
+2. 🖱️ **Double-click `paperflow.bat`** to launch
 3. 📄 **Drop in a PDF** → pick a translation service → hit "Start Translation" → done! 🎉
 
 > 💡 **Tip**: Google / Bing translation is free and requires zero configuration — just open and go!
@@ -80,10 +80,10 @@ Tired of wrestling with Python environments just to translate a paper? Done with
 Translate PDFs directly from Zotero — the translated PDF is automatically added back to the item:
 
 - **One-click plugin install**: Settings → Zotero → "Install Zotero plugin" (Windows / macOS), then restart Zotero
-- **Right-click translate**: right-click a PDF attachment in the item tree or inside the PDF reader → "📖 用 PaperFlow 翻译" (Translate with pdf2zh-desktop)
+- **Right-click translate**: right-click a PDF attachment in the item tree or inside the PDF reader → "📖 用 PaperFlow 翻译" (Translate with paperflow-desktop)
 - **Formats**: side-by-side / dual / mono / all three — selectable right from the context menu
 - **Linked attachments**: if the original PDF lives outside Zotero storage (moved by zotmoov / attanger), the translation is placed next to it and linked back to the item (plugin v1.0.30+)
-- **Plugin settings panel**: Zotero → Settings → pdf2zh 翻译 — default format, silent translation, auto-locate item, app path
+- **Plugin settings panel**: Zotero → Settings → paperflow 翻译 — default format, silent translation, auto-locate item, app path
 - **Silent mode**: translate in the background without stealing focus; the window closes itself when done
 
 > The plugin only needs to be installed once. Users without Zotero are completely unaffected.
@@ -171,15 +171,15 @@ Everything is pre-packaged — truly out of the box ✅
 ## 📂 Directory Structure
 
 ```text
-pdf2zh-desktop-win/
+paperflow-desktop-win/
 ├── core/
 │   ├── runtime/        ⚙️ Embedded Python 3.12
 │   └── site-packages/  📦 All bundled packages
 ├── config/             ⚙️ App configuration
-├── pdf2zh_files/       📄 Translation output
+├── paperflow_files/       📄 Translation output
 ├── logs/               📋 Runtime logs
-├── pdf2zh.bat          ⭐ Main launcher (double-click me!)
-├── pdf2zh.vbs          ⭐ Alt launcher (older Windows)
+├── paperflow.bat          ⭐ Main launcher (double-click me!)
+├── paperflow.vbs          ⭐ Alt launcher (older Windows)
 ├── _launcher.py        🐍 Python entry point
 ├── debug_start.bat     🔧 Debug launcher (shows console + diagnostics)
 ├── install.bat         📥 First-time setup script
@@ -193,7 +193,7 @@ pdf2zh-desktop-win/
 
 | 😰 What happened? | 💡 How to fix |
 | --- | --- |
-| VBS says "incompatible" | Windows 11 24H2 deprecated VBScript — use `pdf2zh.bat` instead |
+| VBS says "incompatible" | Windows 11 24H2 deprecated VBScript — use `paperflow.bat` instead |
 | Double-clicked, nothing happened | Check `logs/startup_*.log` |
 | Translation stopped midway | Check disk space; restart to auto-resume from cache |
 | VC++ error | Run `install.bat` or manually install `VC_redist.x64.exe` |

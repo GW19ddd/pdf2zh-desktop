@@ -1,6 +1,6 @@
 /*
- * pdf2zh 桌面版启动器
- * 编译：windres pdf2zh.rc -o pdf2zh_res.o && gcc -mwindows pdf2zh.c pdf2zh_res.o -o pdf2zh.exe
+ * PaperFlow 桌面版启动器
+ * 编译：windres paperflow.rc -o paperflow_res.o && gcc -mwindows paperflow.c paperflow_res.o -o paperflow.exe
  * 功能：调用同目录下的 core\runtime\pythonw.exe _launcher.py
  */
 #include <windows.h>
@@ -25,8 +25,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (GetFileAttributesW(pythonw) == INVALID_FILE_ATTRIBUTES) {
         MessageBoxW(NULL,
             L"找不到 Python 运行时：core\\runtime\\pythonw.exe\n\n"
-            L"请确保完整解压了 pdf2zh-desktop-win 压缩包。",
-            L"pdf2zh 桌面版", MB_ICONERROR);
+            L"请确保完整解压了 paperflow-desktop-win 压缩包。",
+            L"PaperFlow 桌面版", MB_ICONERROR);
         return 1;
     }
 
@@ -47,8 +47,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     if (!CreateProcessW(NULL, cmdLine, NULL, NULL, FALSE, 0, NULL, appDir, &si, &pi)) {
         MessageBoxW(NULL,
-            L"启动失败，请尝试直接运行 pdf2zh.bat",
-            L"pdf2zh 桌面版", MB_ICONERROR);
+            L"启动失败，请尝试直接运行 paperflow.bat",
+            L"PaperFlow 桌面版", MB_ICONERROR);
         return 1;
     }
 

@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for pdf2zh-desktop macOS"""
+"""PyInstaller spec for PaperFlow macOS"""
 
 import os
 import sys
@@ -103,7 +103,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='pdf2zh',
+    name='paperflow',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -114,7 +114,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=os.path.join(project_dir, 'assets', 'AppIcon.icns'),
+    icon=os.path.join(project_dir, 'assets', 'PaperFlow.icns'),
 )
 
 coll = COLLECT(
@@ -124,17 +124,17 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name='pdf2zh',
+    name='paperflow',
 )
 
 app = BUNDLE(
     coll,
-    name='pdf2zh.app',
-    icon=os.path.join(project_dir, 'assets', 'AppIcon.icns'),
-    bundle_identifier='com.aarongig.pdf2zh',
+    name='paperflow.app',
+    icon=os.path.join(project_dir, 'assets', 'PaperFlow.icns'),
+    bundle_identifier='com.paperflow.desktop',
     info_plist={
-        'CFBundleName': 'pdf2zh',
-        'CFBundleDisplayName': 'pdf2zh-desktop',
+        'CFBundleName': 'PaperFlow',
+        'CFBundleDisplayName': 'PaperFlow',
         'CFBundleVersion': '2.0.0',
         'CFBundleShortVersionString': '2.0.0',
         'LSMinimumSystemVersion': '13.0',

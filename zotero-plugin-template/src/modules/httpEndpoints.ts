@@ -3,8 +3,8 @@ import { debugLog } from "../utils/debug";
 
 /**
  * Zotero 本地 HTTP 端点（与旧版插件协议完全一致）：
- *   POST /pdf2zh/attach  接收桌面端翻译结果，作为子附件挂回原条目
- *   GET  /pdf2zh/ping    健康检查（桌面端「Zotero 联动」据此判断插件是否安装）
+ *   POST /paperflow/attach  接收桌面端翻译结果，作为子附件挂回原条目
+ *   GET  /paperflow/ping    健康检查（桌面端「Zotero 联动」据此判断插件是否安装）
  */
 export interface ZoteroEndpoint {
   supportedMethods: string[];
@@ -125,7 +125,7 @@ class AttachEndpoint implements ZoteroEndpoint {
 
   init = async (options: { data?: unknown }): Promise<[number, string, string]> => {
     try {
-      debugLog("=== /pdf2zh/attach POST received ===");
+      debugLog("=== /paperflow/attach POST received ===");
       const data =
         typeof options.data === "string" ? JSON.parse(options.data) : (options.data || {});
       const itemKey: string = data.itemKey;
@@ -259,7 +259,7 @@ class AttachEndpoint implements ZoteroEndpoint {
         debugLog("  auto-focus failed (ignored): " + e);
       }
 
-      debugLog("  === /pdf2zh/attach DONE ok ===");
+      debugLog("  === /paperflow/attach DONE ok ===");
       return [
         200,
         "application/json",
@@ -272,7 +272,7 @@ class AttachEndpoint implements ZoteroEndpoint {
       ];
     } catch (e: any) {
       debugLog(
-        "  /pdf2zh/attach EXCEPTION: " + e + " stack=" + (e && e.stack ? e.stack : "no-stack")
+        "  /paperflow/attach EXCEPTION: " + e + " stack=" + (e && e.stack ? e.stack : "no-stack")
       );
       return [500, "application/json", JSON.stringify({ error: String(e) })];
     }
@@ -286,14 +286,14 @@ class PingEndpoint implements ZoteroEndpoint {
 
   // 必须声明至少一个参数：Zotero 9 用 init.length 判断调用方式（1=对象式，0/2+=回调式）
   init = async (_options: { data?: unknown }): Promise<[number, string, string]> => {
-    return [200, "application/json", JSON.stringify({ status: "ok", plugin: "pdf2zh-connector" })];
+    return [200, "application/json", JSON.stringify({ status: "ok", plugin: "paperflow-connector" })];
   };
 }
 export function registerHttpEndpoints(): void {
   try {
     const endpoints = (Zotero.Server.Endpoints as any) || {};
-    endpoints["/pdf2zh/attach"] = AttachEndpoint;
-    endpoints["/pdf2zh/ping"] = PingEndpoint;
+    endpoints["/paperflow/attach"] = AttachEndpoint;
+    endpoints["/paperflow/ping"] = PingEndpoint;
     debugLog("HTTP endpoints registered");
   } catch (e) {
     debugLog("registerHttpEndpoints FAILED: " + e);
@@ -302,12 +302,12 @@ export function registerHttpEndpoints(): void {
 
 export function unregisterHttpEndpoints(): void {
   try {
-    delete (Zotero.Server.Endpoints as any)["/pdf2zh/attach"];
+    delete (Zotero.Server.Endpoints as any)["/paperflow/attach"];
   } catch (e) {
     /* ignore */
   }
   try {
-    delete (Zotero.Server.Endpoints as any)["/pdf2zh/ping"];
+    delete (Zotero.Server.Endpoints as any)["/paperflow/ping"];
   } catch (e) {
     /* ignore */
   }

@@ -1,8 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: pdf2zh 桌面版智能启动脚本
-title pdf2zh 桌面版
+:: PaperFlow 桌面版智能启动脚本
+title PaperFlow 桌面版
 
 :: 设置颜色和编码
 color 0F
@@ -10,7 +10,7 @@ color 0F
 :: 显示启动横幅
 echo.
 echo ================================================================
-echo   pdf2zh 桌面版 v2.3.9
+echo   PaperFlow 桌面版 v2.3.9
 echo   PDF 文档翻译工具
 echo ================================================================
 echo.
@@ -63,12 +63,12 @@ if not exist "core\runtime\python.exe" (
 echo [✓] Python 运行时
 
 if not exist "core\site-packages\pdf2zh" (
-    echo [错误] pdf2zh 库未找到
+    echo [错误] PaperFlow 翻译引擎未找到
     echo        请检查 core\site-packages 目录
     pause
     exit /b 1
 )
-echo [✓] pdf2zh 库
+echo [✓] PaperFlow 翻译引擎
 
 if not exist "config\app.json" (
     echo [警告] 应用配置文件不存在，将使用默认配置
@@ -97,7 +97,7 @@ set "PYTHONHOME="
 set "PYTHONPATH="
 set "PATH=%APP_DIR%core\runtime;%PATH%"
 
-if not exist "pdf2zh_files" mkdir "pdf2zh_files"
+if not exist "paperflow_files" mkdir "paperflow_files"
 if not exist "cache" mkdir "cache"
 if not exist "logs" mkdir "logs"
 
@@ -105,7 +105,7 @@ echo [✓] 环境变量已设置
 goto :eof
 
 :start_application
-echo [启动] pdf2zh 桌面版...
+echo [启动] PaperFlow 桌面版...
 echo.
 
 set "LOG_FILE=logs\app_%date:~0,4%%date:~5,2%%date:~8,2%.log"
@@ -127,7 +127,7 @@ mkdir "config" 2>nul
 (
 echo {
 echo   "app": {
-echo     "name": "pdf2zh 桌面版",
+echo     "name": "PaperFlow 桌面版",
 echo     "version": "1.9.9"
 echo   },
 echo   "features": {

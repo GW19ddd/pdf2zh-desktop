@@ -1,6 +1,6 @@
 """
 PaperFlow 启动器
-由 pdf2zh.vbs 调用，使用 pythonw.exe 运行（无控制台窗口）
+由 paperflow.vbs 调用，使用 pythonw.exe 运行（无控制台窗口）
 错误写入日志文件，并通过 Qt 对话框提示用户
 """
 import sys
@@ -112,7 +112,7 @@ def ensure_window_visible(window, app):
 
 def _parse_cli_args(argv):
     """v2.3.4: 解析 Zotero 右键唤起的命令行参数
-    支持: pdf2zh.exe [--format=side_by_side|dual|mono|all] [--auto] [--silent]
+    支持: paperflow.exe [--format=side_by_side|dual|mono|all] [--auto] [--silent]
                     [--zotero-key=XXXXXXXX] [--zotero-link-mode=0|1|2|3] <file.pdf>
     --zotero-key / --zotero-link-mode: v1.0.20 起由插件传入, 用于对 zotmoov 等移动过的链接附件做 Zotero 回写
     """
@@ -159,12 +159,12 @@ def main():
     preload_onnxruntime()
 
     try:
-        log("导入 pdf2zh.gui_pyqt5...")
+        log("导入 PaperFlow GUI...")
         from PyQt5.QtCore import Qt
         from PyQt5.QtWidgets import QApplication
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
         QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-        from pdf2zh.gui_pyqt5 import PDF2ZHMainWindow
+        from pdf2zh.gui_pyqt5 import PaperFlowMainWindow
         log("导入成功，启动 GUI...")
 
         app = QApplication(sys.argv)
@@ -177,7 +177,7 @@ def main():
         # ── 单实例检测 + CLI 参数转发（Zotero 右键唤起）──
         from PyQt5.QtNetwork import QLocalServer, QLocalSocket
         import json as _json
-        _instance_key = "pdf2zh-desktop-singleton-lock"
+        _instance_key = "paperflow-desktop-singleton-lock"
         _socket = QLocalSocket()
         _socket.connectToServer(_instance_key)
         if _socket.waitForConnected(500):
@@ -206,12 +206,12 @@ def main():
         # 导致同样 12px 在 4K@200% 屏显示为 24px 物理，视觉偏大。
         # 补偿公式：dpr>1 时缩小基准字号，使各屏幕物理显示大小接近。
         import builtins
-        builtins._pdf2zh_dpr = dpr
-        builtins._pdf2zh_dpr_scale = 1.0 / max(1.0, dpr ** 0.6)  # 高分屏更强补偿
+        builtins._paperflow_dpr = dpr
+        builtins._paperflow_dpr_scale = 1.0 / max(1.0, dpr ** 0.6)  # 高分屏更强补偿
 
         def build_stylesheet(base_font=14):
             """根据基准字号生成完整样式表（macOS 浅色风，所有尺寸等比联动，DPR 自动补偿）"""
-            dpr_scale = getattr(builtins, '_pdf2zh_dpr_scale', 1.0)
+            dpr_scale = getattr(builtins, '_paperflow_dpr_scale', 1.0)
             f = max(8, round(base_font * dpr_scale))  # DPR 补偿后的实际字号（下限 8px）
             f1 = f + 1             # 卡片标题
             ft = f + 2             # Tooltip
@@ -304,7 +304,7 @@ def main():
 
         # 存为全局函数供字号切换时调用
         import builtins
-        builtins._pdf2zh_build_stylesheet = build_stylesheet
+        builtins._paperflow_build_stylesheet = build_stylesheet
 
         # 从用户配置读取上次字号，默认极小(10)
         _saved_font = 10
@@ -320,7 +320,7 @@ def main():
             pass
         log(f"初始字号: {_saved_font}px")
         app.setStyleSheet(build_stylesheet(_saved_font))
-        window = PDF2ZHMainWindow()
+        window = PaperFlowMainWindow()
         ensure_window_visible(window, app)
         window.show()
         window.raise_()

@@ -77,8 +77,8 @@ def get_zotero_item_key(file_path: str):
 
 def zotero_auto_link(item_key: str, file_path: str, title: str):
     """
-    通过 pdf2zh-connector 插件将译文自动添加为 Zotero 附件。
-    端点: POST http://127.0.0.1:23119/pdf2zh/attach
+    通过 paperflow-connector 插件将译文自动添加为 Zotero 附件。
+    端点: POST http://127.0.0.1:23119/paperflow/attach
     返回 (success: bool, message: str)
     """
     import urllib.request
@@ -90,7 +90,7 @@ def zotero_auto_link(item_key: str, file_path: str, title: str):
     }).encode("utf-8")
     try:
         req = urllib.request.Request(
-            "http://127.0.0.1:23119/pdf2zh/attach",
+            "http://127.0.0.1:23119/paperflow/attach",
             data=payload,
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -102,16 +102,16 @@ def zotero_auto_link(item_key: str, file_path: str, title: str):
                 return False, data["error"]
             return True, f"已关联到 Zotero (key={data.get('key', '?')})"
     except urllib.error.URLError:
-        return False, "pdf2zh Connector 未安装或 Zotero 未运行"
+        return False, "PaperFlow Connector 未安装或 Zotero 未运行"
     except Exception as e:
         return False, str(e)
 
 
 def zotero_plugin_installed():
-    """检测 pdf2zh-connector 插件是否已安装"""
+    """检测 paperflow-connector 插件是否已安装"""
     import urllib.request
     try:
-        req = urllib.request.Request("http://127.0.0.1:23119/pdf2zh/ping")
+        req = urllib.request.Request("http://127.0.0.1:23119/paperflow/ping")
         with urllib.request.urlopen(req, timeout=3) as resp:
             return resp.status == 200
     except Exception:
